@@ -10,6 +10,11 @@
 
 # production
 /build
+/build_keycloak
+
+# IDEs and editors
+/.idea
+/.vscode
 
 # misc
 .DS_Store
@@ -21,3 +26,5 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+tsconfig.tsbuildinfo
