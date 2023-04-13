@@ -44,6 +44,10 @@ const NavMenu = styled.div`
 const TopNavBar = () => {
   const classes = useStyles();
 
+  const openSetting = () => {
+    console.log('얍');
+  };
+
   return (
     <AppBar className={classes.appBar}>
       <Toolbar className={classes.toolBar}>
@@ -53,7 +57,7 @@ const TopNavBar = () => {
         <NavMenu>
           <NotificationsNoneOutlinedIcon fontSize="small" />
         </NavMenu>
-        <NavMenu>
+        <NavMenu onClick={openSetting}>
           <SettingsOutlinedIcon fontSize="small" />
         </NavMenu>
       </Toolbar>

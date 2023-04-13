@@ -9,9 +9,7 @@ const EditDashboard = styled.div`
   overflow-y: auto;
   position: relative;
   display: block;
-  flex-basis: auto;
-  flex-grow: 1;
-  flex-shrink: 1;
+  flex: 1 1 auto;
   box-sizing: border-box;
 `;
 

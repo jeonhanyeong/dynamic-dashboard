@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 import styled from 'styled-components';
 import TextField from '@material-ui/core/TextField';
+import TileGallery from './TileGallery';
 
 const ContentTop = styled.div`
   display: flex;
@@ -23,6 +24,10 @@ const Explain = styled.div`
 `;
 
 const DashboardHeader = () => {
+  const galleryOpen = () => {
+    console.log('타일 추가!');
+  };
+
   return (
     <>
       <ContentTop>
@@ -49,7 +54,7 @@ const DashboardHeader = () => {
         </Button>
       </ContentTop>
       <Explain>
-        <Button variant="outlined" color="primary" startIcon={<AddIcon />} size="small">
+        <Button variant="outlined" color="primary" startIcon={<AddIcon />} size="small" onClick={galleryOpen}>
           타일 추가
         </Button>
         <div style={{ marginTop: '5px' }}>

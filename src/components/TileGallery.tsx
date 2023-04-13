@@ -35,9 +35,6 @@ const TileGalleryBody = styled.ul`
 
   overflow-y: auto;
 `;
-const iconStyle = {
-  cursor: 'pointer',
-};
 
 const buttonStyle = {
   margin: '20px',
@@ -45,15 +42,39 @@ const buttonStyle = {
 
 const TileGallery = () => {
   const [isCloseTile, setIsCloseTile] = useState(false);
-  const handleClose = () => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+  };
+
+  // 창 닫는 이벤트
+  const handleGalleryClose = () => {
     setIsCloseTile(true);
   };
 
+  const handleGalleryOpen = () => {
+    setIsCloseTile(false);
+  };
   return (
     <TileGalleryContents style={{ display: isCloseTile ? 'none' : 'block' }}>
       <TileGalleryHeader>
-        <h2>타일 갤러리</h2>
-        <CloseIcon style={iconStyle} onClick={handleClose} />
+        <h1>타일 갤러리</h1>
+        <CloseIcon
+          style={{
+            cursor: 'pointer',
+            backgroundColor: isHovered ? '#a52121' : '#fff',
+            color: isHovered ? '#fff' : '#000',
+            padding: '5px',
+          }}
+          onClick={handleGalleryClose}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        />
       </TileGalleryHeader>
       <p style={{ fontSize: '12px', padding: '0 15px' }}>타일을 끌어서 놓거나 선택한 후 추가를 클릭하세요.</p>
       <SearchBox />

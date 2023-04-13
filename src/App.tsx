@@ -4,6 +4,7 @@ import TileGallery from './components/TileGallery';
 import TopNavBar from './components/TopNavBar';
 import DashboardHeader from './components/DashboardHeader';
 import DashboardBody from './components/DashboardBody';
+import ModeSetting from './components/ModeSetting';
 
 const WebContainer = styled.div`
   position: fixed;
@@ -14,7 +15,7 @@ const WebContainer = styled.div`
   overflow: hidden;
   z-index: 0;
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* 위에서 아래로 배치 */
   font-size: 13px;
   line-height: normal;
   width: 100%;
@@ -42,8 +43,7 @@ const Dashboard = styled.div`
   width: 100%;
   z-index: 0;
   display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
+  flex-flow: column nowrap;
   overflow: hidden;
 `;
 
@@ -57,6 +57,7 @@ const App = () => {
           <DashboardBody />
         </Dashboard>
         <TileGallery />
+        <ModeSetting />
       </Contents>
     </WebContainer>
   );
