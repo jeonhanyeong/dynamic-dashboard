@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
-import CardMedia from '@material-ui/core/CardMedia';
+import CardMedia from '@mui/material/CardMedia';
 import testImage from '../assets/images/test.png';
 
 const useStyles = makeStyles(() =>
@@ -58,7 +58,7 @@ const TileCard = () => {
   const classes = useStyles();
 
   return (
-    <li className={classes.root}>
+    <li className={classes.root} draggable="true">
       <div className={classes.card}>
         <CardMedia className={classes.cover} image={testImage} title="Title" />
         <div className={classes.content}>

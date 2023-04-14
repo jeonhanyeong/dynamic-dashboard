@@ -1,9 +1,13 @@
 import React, { useState, useRef } from 'react';
-import Button from '@material-ui/core/Button';
-import AddIcon from '@material-ui/icons/Add';
+import Button from '@mui/material//Button';
+import AddIcon from '@mui/icons-material/Add';
 import styled from 'styled-components';
-import TextField from '@material-ui/core/TextField';
+import TextField from '@mui/material/TextField';
 import TileGallery from './TileGallery';
+
+type MyComponentProps = {
+  handleGalleryVisible: () => void;
+};
 
 const ContentTop = styled.div`
   display: flex;
@@ -23,9 +27,9 @@ const Explain = styled.div`
   display: block;
 `;
 
-const DashboardHeader = () => {
+const DashboardHeader = ({ handleGalleryVisible }: MyComponentProps) => {
   const galleryOpen = () => {
-    console.log('타일 추가!');
+    handleGalleryVisible();
   };
 
   return (

@@ -1,4 +1,5 @@
 import './App.css';
+import { useState } from 'react';
 import styled from 'styled-components';
 import TileGallery from './components/TileGallery';
 import TopNavBar from './components/TopNavBar';
@@ -48,16 +49,27 @@ const Dashboard = styled.div`
 `;
 
 const App = () => {
+  const [galleryVisible, setGalleryVisible] = useState(true);
+  const [settingVisible, setSettingVisible] = useState(false);
+
+  const handleGalleryVisible = () => {
+    setGalleryVisible(!galleryVisible); // 부모 컴포넌트의 상태를 변경
+  };
+
+  const handleSettingVisible = () => {
+    setSettingVisible(!settingVisible); // 부모 컴포넌트의 상태를 변경
+  };
+
   return (
     <WebContainer>
-      <TopNavBar />
+      <TopNavBar handleSettingVisible={handleSettingVisible} />
       <Contents>
         <Dashboard>
-          <DashboardHeader />
+          <DashboardHeader handleGalleryVisible={handleGalleryVisible} />
           <DashboardBody />
         </Dashboard>
-        <TileGallery />
-        <ModeSetting />
+        {galleryVisible && <TileGallery handleGalleryVisible={handleGalleryVisible} />}
+        {settingVisible && <ModeSetting />}
       </Contents>
     </WebContainer>
   );
