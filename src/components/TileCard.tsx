@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 import CardMedia from '@mui/material/CardMedia';
 import testImage from '../assets/images/test.png';
@@ -53,11 +54,13 @@ const CardDescription = styled.span`
   overflow: hidden;
   text-overflow: ellipsis;
 `;
-
-const TileCard = () => {
+interface TileCardProps {
+  type: string;
+}
+const TileCard = ({ type }: TileCardProps) => {
   return (
-    <Tile draggable>
-      <Card>
+    <Tile>
+      <Card draggable className={type}>
         <CardMedia style={media} image={testImage} title="Title" />
         <CardContent>
           <CardTitle>매트릭 차트</CardTitle>

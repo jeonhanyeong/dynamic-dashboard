@@ -62,6 +62,7 @@ const TileGallery = ({ handleGalleryVisible }: MyComponentProps) => {
   const handleGalleryClose = () => {
     handleGalleryVisible();
   };
+  const tileTypes = ['LineChart', 'BarChart'];
 
   return (
     <TileGalleryContents>
@@ -72,15 +73,9 @@ const TileGallery = ({ handleGalleryVisible }: MyComponentProps) => {
       <p style={{ fontSize: '12px', padding: '0 15px' }}>타일을 끌어서 놓거나 선택한 후 추가를 클릭하세요.</p>
       <SearchBox />
       <TileGalleryBody>
-        <TileCard />
-        <TileCard />
-        <TileCard />
-        <TileCard />
-        <TileCard />
-        <TileCard />
-        <TileCard />
-        <TileCard />
-        <TileCard />
+        {tileTypes.map((tileType, index) => (
+          <TileCard key={tileType} type={tileType} />
+        ))}
       </TileGalleryBody>
       <Button style={buttonStyle} variant="contained" size="small" color="primary">
         추가

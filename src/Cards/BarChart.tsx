@@ -1,21 +1,6 @@
-import {
-  Chart,
-  Series,
-  ArgumentAxis,
-  CommonSeriesSettings,
-  Export,
-  Legend,
-  Margin,
-  Title,
-  Subtitle,
-  Tooltip,
-  Grid,
-} from 'devextreme-react/chart';
+import { Chart, Series } from 'devextreme-react/chart';
 import styled from 'styled-components';
-import service from './data.js';
-
-const countriesInfo = service.getCountriesInfo();
-const energySources = service.getEnergySources();
+import { dataSource } from './data.js';
 
 const CardBoard = styled.div`
   border: 1px solid #e1dfdd;
@@ -78,21 +63,8 @@ const LineChart = (props: LineChartPosition) => {
   return (
     <CardBoard className="Card" style={{ top: topPx, left: leftPx }} draggable>
       <Cover className="Card-Cover" />
-      <Chart height="100%" width="100%" dataSource={countriesInfo}>
-        <CommonSeriesSettings argumentField="country" />
-        {energySources.map((item) => (
-          <Series key={item.value} valueField={item.value} name={item.name} />
-        ))}
-        <Margin bottom={20} />
-        <ArgumentAxis valueMarginsEnabled={false} discreteAxisDivisionMode="crossLabels">
-          <Grid visible />
-        </ArgumentAxis>
-        <Legend verticalAlignment="bottom" horizontalAlignment="center" itemTextPosition="bottom" />
-        <Export enabled />
-        <Title text="Energy Consumption in 2004">
-          <Subtitle text="(Millions of Tons, Oil Equivalent)" />
-        </Title>
-        <Tooltip enabled />
+      <Chart height="100%" width="100%" id="chart" dataSource={dataSource}>
+        <Series valueField="oranges" argumentField="day" name="My oranges" type="bar" color="#ffaa66" />
       </Chart>
       <ResizeHandle>
         <Equip />
