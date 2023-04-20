@@ -1,9 +1,7 @@
-import { makeStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core//Toolbar';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import styled from 'styled-components';
 
@@ -11,28 +9,24 @@ type MyComponentProps = {
   handleSettingVisible: () => void;
 };
 
-// Material-UI에서 사용할 스타일을 정의합니다.
-const useStyles = makeStyles((theme) => ({
-  appBar: {
-    backgroundColor: '#1565c0',
-    color: '#fff',
-    height: '40px',
-    position: 'relative',
-    zIndex: 999,
-    minHeight: '40px',
-  },
-  toolBar: {
-    minHeight: '40px',
-  },
-  title: {
-    flexGrow: 1,
-    fontSize: 15,
-    marginLeft: 20,
-  },
-  dashIcon: {
-    fontSize: 20,
-  },
-}));
+const toolbarStlye = {
+  minHeight: '40px',
+};
+
+const titleStyle = {
+  flexGrow: 1,
+  fontSize: 15,
+  marginLeft: 20,
+};
+
+const appbarStyle = {
+  backgroundColor: '#1565c0',
+  color: '#fff',
+  height: '40px',
+
+  zIndex: 999,
+  minHeight: '40px',
+};
 
 const NavMenu = styled.div`
   display: flex;
@@ -48,17 +42,15 @@ const NavMenu = styled.div`
 `;
 
 const TopNavBar = ({ handleSettingVisible }: MyComponentProps) => {
-  const classes = useStyles();
-
   const openSetting = () => {
     handleSettingVisible();
   };
 
   return (
-    <AppBar className={classes.appBar}>
-      <Toolbar className={classes.toolBar}>
-        <DashboardIcon className={classes.dashIcon} />
-        <h6 className={classes.title}>Dynamic Dashboard</h6>
+    <AppBar position="static" style={appbarStyle}>
+      <Toolbar style={toolbarStlye}>
+        <DashboardIcon />
+        <h6 style={titleStyle}>Dynamic Dashboard </h6>
         {/* 주우서억 */}
         <NavMenu>
           <NotificationsNoneOutlinedIcon fontSize="small" />

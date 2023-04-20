@@ -1,6 +1,6 @@
-import TextField from '@material-ui/core/TextField';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import SearchIcon from '@material-ui/icons/Search';
+import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
+import SearchIcon from '@mui/icons-material/Search';
 
 const SearchBox = () => {
   return (
@@ -17,6 +17,7 @@ const SearchBox = () => {
         style: {
           margin: '20px',
           width: '80%',
+          height: '30px',
         },
       }}
     />

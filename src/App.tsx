@@ -1,3 +1,4 @@
+import 'devextreme/dist/css/dx.light.css';
 import './App.css';
 import { useState } from 'react';
 import styled from 'styled-components';
