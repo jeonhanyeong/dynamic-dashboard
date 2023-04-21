@@ -58,9 +58,10 @@ interface TileCardProps {
   type: string;
 }
 const TileCard = ({ type }: TileCardProps) => {
+  const classes = `${type} Tile`;
   return (
     <Tile>
-      <Card draggable className={type}>
+      <Card draggable className={classes}>
         <CardMedia style={media} image={testImage} title="Title" />
         <CardContent>
           <CardTitle>매트릭 차트</CardTitle>

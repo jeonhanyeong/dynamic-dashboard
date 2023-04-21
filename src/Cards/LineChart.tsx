@@ -11,6 +11,7 @@ import {
   Tooltip,
   Grid,
 } from 'devextreme-react/chart';
+import { useRef, useState } from 'react';
 import styled from 'styled-components';
 import service from './data.js';
 
@@ -29,6 +30,8 @@ const CardBoard = styled.div`
   position: absolute;
   border-radius: 2px;
   cursor: move;
+  transition: height 125ms linear 125ms, width 125ms linear 0s, top 175ms ease-out, left 175ms ease-out,
+    right 175ms ease-out;
 `;
 
 const Cover = styled.div`
@@ -73,10 +76,36 @@ type LineChartPosition = {
 };
 
 const LineChart = (props: LineChartPosition) => {
+  const cardBoardRef = useRef<HTMLDivElement>(null);
+  const cardBoardComponent = cardBoardRef.current as HTMLDivElement;
   const { topPx, leftPx } = props;
 
+  const [isDragging, setIsDragging] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    if (isDragging) {
+      const x = Math.round((event.clientX - cardBoardComponent.offsetLeft) / 90) * 90;
+      const y = Math.round((event.clientX - cardBoardComponent.offsetTop) / 90) * 90;
+      setPosition({ x, y });
+    }
+  };
+
+  const handleMouseUp = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    cardBoardComponent.style.top = `${position.y}px`;
+    cardBoardComponent.style.left = `${position.x}px`;
+    setIsDragging(false);
+  };
+
   return (
-    <CardBoard className="Card" style={{ top: topPx, left: leftPx }} draggable>
+    <CardBoard ref={cardBoardRef} className="Card" style={{ top: topPx, left: leftPx }} draggable>
       <Cover className="Card-Cover" />
       <Chart height="100%" width="100%" dataSource={countriesInfo}>
         <CommonSeriesSettings argumentField="country" />

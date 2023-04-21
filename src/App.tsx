@@ -50,11 +50,11 @@ const Dashboard = styled.div`
 `;
 
 const App = () => {
-  const [dragTarget, setDragTarget] = useState('');
+  const parent = useRef<HTMLDivElement>(null);
 
+  const [dragTarget, setDragTarget] = useState('');
   const [galleryVisible, setGalleryVisible] = useState(true);
   const [settingVisible, setSettingVisible] = useState(false);
-  const parent = useRef<HTMLDivElement>(null);
 
   const handleGalleryVisible = () => {
     setGalleryVisible(!galleryVisible); // 부모 컴포넌트의 상태를 변경
@@ -63,23 +63,17 @@ const App = () => {
   const handleSettingVisible = () => {
     setSettingVisible(!settingVisible); // 부모 컴포넌트의 상태를 변경
   };
-  const handleClick = (e: { target: any; currentTarget: any }) => {
-    // console.log('클릭요소');
-    // console.log(e.target);
-  };
 
-  const handleDragStart = (e: { target: any }) => {
+  const handleDragStart = (event: { target: any }) => {
     // console.log(e.target.className);
-    setDragTarget(e.target.className);
+    setDragTarget(event.target.className);
   };
 
   useEffect(() => {
     const parentComponent = parent.current as HTMLDivElement;
-    parentComponent.addEventListener('click', handleClick);
     parentComponent.addEventListener('dragstart', handleDragStart);
 
     return () => {
-      parentComponent.removeEventListener('click', handleClick);
       parentComponent.removeEventListener('dragstart', handleDragStart);
     };
   }, []);
