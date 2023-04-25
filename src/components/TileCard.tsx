@@ -59,9 +59,19 @@ interface TileCardProps {
 }
 const TileCard = ({ type }: TileCardProps) => {
   const classes = `${type} Tile`;
+
+  const handleDragStart = (event: React.DragEvent<HTMLDivElement>) => {
+    return true;
+  };
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+  };
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+  };
   return (
-    <Tile>
-      <Card draggable className={classes}>
+    <Tile draggable>
+      <Card draggable className={classes} onDragStart={handleDragStart} onDragOver={handleDragOver} onDrop={handleDrop}>
         <CardMedia style={media} image={testImage} title="Title" />
         <CardContent>
           <CardTitle>매트릭 차트</CardTitle>

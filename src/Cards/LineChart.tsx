@@ -11,7 +11,9 @@ import {
   Tooltip,
   Grid,
 } from 'devextreme-react/chart';
-import { useRef, useState } from 'react';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
+import { useRef, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import service from './data.js';
 
@@ -42,7 +44,8 @@ const Cover = styled.div`
   box-sizing: border-box;
   padding: 0;
   margin: 0;
-  background-color: none;
+  opacity: 0.5;
+  background-color: white;
   z-index: 998;
   position: absolute;
   display: block;
@@ -70,43 +73,102 @@ const Equip = styled.div`
   cursor: se-resize;
 `;
 
+const ActionBar = styled.div`
+  width: 100%;
+  z-index: 999;
+  height: 25px;
+  background-color: none;
+  display: none;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  justify-content: right;
+  box-sizing: border-box;
+`;
+
+const DeleteComponent = styled.div`
+  width: 25px;
+  height: 100%;
+  background-color: none;
+  &:hover {
+    background-color: #a52121;
+    color: white;
+  }
+  cursor: pointer;
+  padding: 2px;
+  box-sizing: border-box;
+`;
+
+const ActionMenu = styled.div`
+  width: 25px;
+  height: 100%;
+  background-color: none;
+  &:hover {
+    background-color: #bcbcbc;
+  }
+  cursor: pointer;
+  box-sizing: border-box;
+  padding: 2px;
+`;
+
+const CardTitle = styled.div`
+  width: 100%;
+  height: auto;
+  background-color: none;
+  font-size: 14px;
+  font-weight: bold;
+  padding-left: 5px;
+`;
+
 type LineChartPosition = {
   topPx: number;
   leftPx: number;
 };
 
-const LineChart = (props: LineChartPosition) => {
+const LineChart = ({ topPx, leftPx }: LineChartPosition) => {
   const cardBoardRef = useRef<HTMLDivElement>(null);
-  const cardBoardComponent = cardBoardRef.current as HTMLDivElement;
-  const { topPx, leftPx } = props;
-
-  const [isDragging, setIsDragging] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-
-  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    if (isDragging) {
-      const x = Math.round((event.clientX - cardBoardComponent.offsetLeft) / 90) * 90;
-      const y = Math.round((event.clientX - cardBoardComponent.offsetTop) / 90) * 90;
-      setPosition({ x, y });
+  const actionBarRef = useRef<HTMLDivElement>(null);
+  const coverRef = useRef<HTMLDivElement>(null);
+  const handleMouseEnter = (event: React.MouseEvent) => {
+    console.log(event.target);
+    const enteredElement = event.target as HTMLDivElement;
+    // enteredElement.style.opacity = '0';
+    if (actionBarRef.current && coverRef.current) {
+      actionBarRef.current.style.display = 'flex';
+      coverRef.current.style.opacity = '0';
     }
   };
 
-  const handleMouseUp = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    cardBoardComponent.style.top = `${position.y}px`;
-    cardBoardComponent.style.left = `${position.x}px`;
-    setIsDragging(false);
+  const handleMouseLeave = (event: React.MouseEvent) => {
+    const enteredElement = event.target as HTMLDivElement;
+    // enteredElement.style.opacity = '0.5';
+    if (actionBarRef.current && coverRef.current) {
+      actionBarRef.current.style.display = 'none';
+      coverRef.current.style.opacity = '0.5';
+    }
   };
 
   return (
-    <CardBoard ref={cardBoardRef} className="Card" style={{ top: topPx, left: leftPx }} draggable>
-      <Cover className="Card-Cover" />
+    <CardBoard
+      ref={cardBoardRef}
+      className="Card"
+      style={{ top: topPx, left: leftPx }}
+      draggable
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <ActionBar ref={actionBarRef}>
+        <DeleteComponent>
+          <DeleteOutlineOutlinedIcon style={{ color: 'gray' }} fontSize="small" />
+        </DeleteComponent>
+        <ActionMenu>
+          <MoreHorizOutlinedIcon style={{ color: 'gray' }} fontSize="small" />
+        </ActionMenu>
+      </ActionBar>
+      <Cover ref={coverRef} className="Card-Cover" />
+      <CardTitle>
+        <span>라인 차트</span>
+      </CardTitle>
       <Chart height="100%" width="100%" dataSource={countriesInfo}>
         <CommonSeriesSettings argumentField="country" />
         {energySources.map((item) => (

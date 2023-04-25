@@ -52,16 +52,9 @@ const Equip = styled.div`
   cursor: se-resize;
 `;
 
-type LineChartPosition = {
-  topPx: number;
-  leftPx: number;
-};
-
-const LineChart = (props: LineChartPosition) => {
-  const { topPx, leftPx } = props;
-
+const BarChart = () => {
   return (
-    <CardBoard className="Card" style={{ top: topPx, left: leftPx }} draggable>
+    <CardBoard className="Card" style={{ top: '300px', left: '300px' }} draggable>
       <Cover className="Card-Cover" />
       <Chart height="100%" width="100%" id="chart" dataSource={dataSource}>
         <Series valueField="oranges" argumentField="day" name="My oranges" type="bar" color="#ffaa66" />
@@ -73,4 +66,4 @@ const LineChart = (props: LineChartPosition) => {
   );
 };
 
-export default LineChart;
+export default BarChart;

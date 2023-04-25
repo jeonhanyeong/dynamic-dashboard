@@ -52,7 +52,7 @@ const Dashboard = styled.div`
 const App = () => {
   const parent = useRef<HTMLDivElement>(null);
 
-  const [dragTarget, setDragTarget] = useState('');
+  const [dragTarget, setDragTarget] = useState<HTMLDivElement | null>(null);
   const [galleryVisible, setGalleryVisible] = useState(true);
   const [settingVisible, setSettingVisible] = useState(false);
 
@@ -64,9 +64,10 @@ const App = () => {
     setSettingVisible(!settingVisible); // 부모 컴포넌트의 상태를 변경
   };
 
-  const handleDragStart = (event: { target: any }) => {
+  const handleDragStart = (event: DragEvent) => {
     // console.log(e.target.className);
-    setDragTarget(event.target.className);
+    setDragTarget(event.target as HTMLDivElement);
+    console.log(event.target);
   };
 
   useEffect(() => {

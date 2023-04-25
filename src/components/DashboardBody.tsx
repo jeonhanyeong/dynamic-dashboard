@@ -7,7 +7,7 @@ import LineChart from '../Cards/LineChart';
 import BarChart from '../Cards/BarChart';
 
 interface MyComponentProps extends HTMLAttributes<HTMLDivElement> {
-  dragTarget: string;
+  dragTarget: HTMLDivElement | null;
 }
 
 const EditDashboard = styled.div`
@@ -47,9 +47,21 @@ const DashboardBody = ({ dragTarget }: MyComponentProps) => {
   const dragPlaceholderRef = useRef<HTMLDivElement>(null);
   let positionTop = 0;
   let positionLeft = 0;
+
   const [dragPosition, setDragPosition] = useState({ positionTop, positionLeft });
   const [dragging, setDragging] = useState(false);
   const [tiles, setTiles] = useState<JSX.Element[]>([]);
+  const [position, setPosition] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
+  const [clicked, setClicked] = useState(false);
+  const [offset, setOffset] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
+  const [mouseDownTarget, setMouseDownTarget] = useState<HTMLDivElement | null>(null);
+  const [timerId, setTimerId] = useState<number | undefined>(undefined);
 
   // 타일을 대시보드로 끌어올 때
   const handleTileDragOver = (event: DragEvent) => {
@@ -82,54 +94,80 @@ const DashboardBody = ({ dragTarget }: MyComponentProps) => {
       setDragging(false);
     }
   };
+  // 타일 안에 있는 카드 드래그해서 이동시키기
+  // 이거 해결해야함 무조건
 
-  const handleCardDragStart = (event: MouseEvent) => {
-    console.log('이거');
+  const handleCardMouseDown = (event: React.MouseEvent) => {
+    //  event.preventDefault(); // 기본 기능 막기(?)
+    const target = event.target as HTMLElement;
+    const cardInDashboard = target.parentElement as HTMLDivElement;
+    if (cardInDashboard?.className.includes('Card')) {
+      setClicked(true);
+      setOffset({ x: event.clientX, y: event.clientY });
+      setMouseDownTarget(cardInDashboard);
+    } else event.preventDefault();
   };
 
-  const handleCardDrag = (event: MouseEvent) => {
-    console.log('해야');
+  const handleCardDragOver = (event: React.DragEvent) => {
+    event.preventDefault();
+    if (clicked && mouseDownTarget?.className.includes('Card')) {
+      const x = Math.round((event.clientX - offset.x) / 90) * 90;
+      const y = Math.round((event.clientY - offset.y) / 90) * 90;
+      mouseDownTarget.style.opacity = '0.6';
+      setPosition({ x, y });
+
+      window.clearTimeout(timerId);
+      setTimerId(undefined);
+      const timer = window.setTimeout(() => {
+        const cardInDashboardTop = mouseDownTarget.style.top;
+        const cardInDashboardLeft = mouseDownTarget.style.left;
+        mouseDownTarget.style.top = `${parseInt(cardInDashboardTop, 10) + position.y}px`;
+        mouseDownTarget.style.left = `${parseInt(cardInDashboardLeft, 10) + position.x}px`;
+        mouseDownTarget.style.opacity = '1';
+      }, 100);
+      setTimerId(timer);
+    }
   };
 
-  const handleCardDragEnd = (event: MouseEvent) => {
-    console.log('돼 정신차려');
+  const handleCardDrop = (event: React.DragEvent) => {
+    event.preventDefault();
+    setClicked(false);
+  };
+
+  const handleCardDragLeave = (event: React.DragEvent) => {
+    event.preventDefault();
+    console.log(event.relatedTarget);
   };
 
   // 마운트 + dragTarget 변경될 때 마다 실행됨
   useEffect(() => {
-    const tileComponent = tileGridRef.current as HTMLDivElement;
-    if (dragTarget.includes('Tile')) {
-      tileComponent.addEventListener('drop', handleTileDrop);
-      tileComponent.addEventListener('dragover', handleTileDragOver);
-      tileComponent.addEventListener('dragleave', handleTileDragLeave);
-      console.log('타일 드래그');
-    } else if (dragTarget.includes('Card')) {
-      tileComponent.addEventListener('mousedown', handleCardDragStart);
-      tileComponent.addEventListener('mouseup', handleCardDragEnd);
-      tileComponent.addEventListener('mousemove', handleCardDrag);
+    console.log(dragTarget);
 
-      console.log('카드 드래그');
-    } else console.log(dragTarget);
+    const tileComponent = tileGridRef.current as HTMLDivElement;
+
+    if (dragTarget?.className.includes('Tile')) {
+      tileComponent.addEventListener('dragover', handleTileDragOver);
+      tileComponent.addEventListener('drop', handleTileDrop);
+      tileComponent.addEventListener('dragleave', handleTileDragLeave);
+    }
 
     // Clean Up
     return () => {
-      if (dragTarget.includes('Tile')) {
-        tileComponent.removeEventListener('dragover', handleTileDragOver);
-        tileComponent.removeEventListener('drop', handleTileDrop);
-        tileComponent.removeEventListener('dragleave', handleTileDragLeave);
-        console.log('타일 드래그 리턴');
-      } else {
-        tileComponent.removeEventListener('mousedown', handleCardDragStart);
-        tileComponent.removeEventListener('mouseup', handleCardDragEnd);
-        tileComponent.removeEventListener('mousemove', handleCardDrag);
-        console.log('카드 드래그 리턴');
-      }
+      tileComponent.removeEventListener('dragover', handleTileDragOver);
+      tileComponent.removeEventListener('drop', handleTileDrop);
+      tileComponent.removeEventListener('dragleave', handleTileDragLeave);
     };
   }, [dragTarget]);
 
   return (
     <EditDashboard>
-      <TileGrid ref={tileGridRef}>
+      <TileGrid
+        ref={tileGridRef}
+        onMouseDown={handleCardMouseDown}
+        onDragOver={handleCardDragOver}
+        onDrop={handleCardDrop}
+        onDragLeave={handleCardDragLeave}
+      >
         {tiles}
 
         {dragging && (
