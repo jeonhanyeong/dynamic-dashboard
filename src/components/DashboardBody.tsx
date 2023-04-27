@@ -136,13 +136,10 @@ const DashboardBody = ({ dragTarget }: MyComponentProps) => {
 
   const handleCardDragLeave = (event: React.DragEvent) => {
     event.preventDefault();
-    console.log(event.relatedTarget);
   };
 
   // 마운트 + dragTarget 변경될 때 마다 실행됨
   useEffect(() => {
-    console.log(dragTarget);
-
     const tileComponent = tileGridRef.current as HTMLDivElement;
 
     if (dragTarget?.className.includes('Tile')) {
