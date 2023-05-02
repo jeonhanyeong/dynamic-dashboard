@@ -51,7 +51,6 @@ const Dashboard = styled.div`
 
 const App = () => {
   const parent = useRef<HTMLDivElement>(null);
-
   const [dragTarget, setDragTarget] = useState<HTMLDivElement | null>(null);
   const [galleryVisible, setGalleryVisible] = useState(true);
   const [settingVisible, setSettingVisible] = useState(false);

@@ -32,6 +32,8 @@ const CardBoard = styled.div`
   transition: height 125ms linear 125ms, width 125ms linear 0s, top 175ms ease-out, left 175ms ease-out,
     right 175ms ease-out;
   z-index: 991;
+  min-height: 90px;
+  min-width: 90px;
 `;
 
 const Cover = styled.div`
@@ -131,23 +133,21 @@ const TestDiv = styled.div`
   min-width: 90px;
 `;
 
-type LineChartPosition = {
+interface LineChartPosition {
   topPx: number;
   leftPx: number;
-};
+  widthPx: number;
+  heightPx: number;
+  name: string;
+  displayState: string;
+}
 
-const LineChart = ({ topPx, leftPx }: LineChartPosition) => {
+const MIN_SIZE = 90; // 카드 사이즈 조절 최소값
+const LineChart = ({ topPx, name, leftPx, widthPx, heightPx, displayState }: LineChartPosition) => {
   const cardBoardRef = useRef<HTMLDivElement>(null);
   const actionBarRef = useRef<HTMLDivElement>(null);
   const coverRef = useRef<HTMLDivElement>(null);
   const resizeHandleRef = useRef<HTMLDivElement>(null);
-  const resizeCardRef = useRef<HTMLDivElement>(null);
-  const placeholderRef = useRef<HTMLDivElement>(null);
-  const [isResizing, setIsResizing] = useState(false);
-  const [cardDisplay, setCardDisplay] = useState('block');
-  const [componentSize, setComponentSize] = useState({ compWidth: 535, compHeight: 355 });
-  const [previewSize, setPreviewSize] = useState({ previewWidth: 0, previewHeight: 0 });
-  const [placeholderSize, setPlaceholderSize] = useState({ placeholderWidth: 0, placeholderHeight: 0 });
 
   const handleMouseEnter = (event: React.MouseEvent) => {
     if (actionBarRef.current && coverRef.current) {
@@ -163,149 +163,52 @@ const LineChart = ({ topPx, leftPx }: LineChartPosition) => {
     }
   };
 
-  const startResize = (downEvent: React.MouseEvent) => {
-    setCardDisplay('none');
-    setIsResizing(true);
-    setPreviewSize((prev) => ({
-      ...prev,
-      previewWidth: componentSize.compWidth,
-      previewHeight: componentSize.compHeight,
-    }));
-    setPlaceholderSize((prev) => ({
-      ...prev,
-      placeholderWidth: componentSize.compWidth,
-      placeholderHeight: componentSize.compHeight,
-    }));
-  };
-
-  // Azure 에서는 화면 전체에 된다..?
-  const resizeMouseMove = (moveEvent: React.MouseEvent) => {
-    if (!isResizing) return;
-    const placeholder = placeholderRef.current as HTMLDivElement;
-    const resizeCard = resizeCardRef.current as HTMLDivElement;
-    const updatedWidth = Math.round(moveEvent.clientX - resizeCard.getBoundingClientRect().left);
-    const updatedHeight = Math.round(moveEvent.clientY - resizeCard.getBoundingClientRect().top);
-
-    if (placeholderSize.placeholderHeight < previewSize.previewHeight) {
-      setPlaceholderSize((prev) => ({
-        ...prev,
-        placeholderHeight: componentSize.compHeight + 90,
-      }));
-    } else if (placeholderSize.placeholderHeight - previewSize.previewHeight >= 90) {
-      setPlaceholderSize((prev) => ({
-        ...prev,
-        placeholderHeight: componentSize.compHeight - 90,
-      }));
-    } else if (placeholderSize.placeholderWidth < previewSize.previewWidth) {
-      setPlaceholderSize((prev) => ({
-        ...prev,
-        placeholderWidth: componentSize.compWidth + 90,
-      }));
-    } else if (placeholderSize.placeholderWidth - previewSize.previewWidth >= 90) {
-      setPlaceholderSize((prev) => ({
-        ...prev,
-        placeholderWidth: componentSize.compWidth - 90,
-      }));
-    } else console.log('아니야.');
-
-    setPreviewSize((prevSize) => ({
-      ...prevSize,
-      previewWidth: updatedWidth,
-      previewHeight: updatedHeight,
-    }));
-
-    console.log('무브');
-  };
-
-  const stopResize = () => {
-    console.log('업');
-
-    setIsResizing(false);
-    setCardDisplay('block');
-    setComponentSize((prevSize) => ({
-      ...prevSize,
-      compWidth: Math.round(previewSize.previewWidth / 89) * 89,
-      compHeight: Math.round(previewSize.previewHeight / 89) * 89,
-    }));
-    console.log(componentSize.compWidth);
-    console.log(componentSize.compHeight);
-  };
-
   return (
-    <>
-      <CardBoard
-        ref={cardBoardRef}
-        className="Card"
-        style={{
-          top: topPx,
-          left: leftPx,
-          width: `${componentSize.compWidth}px`,
-          height: `${componentSize.compHeight}px`,
-          display: cardDisplay,
-        }}
-        draggable
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
-        <ActionBar ref={actionBarRef}>
-          <DeleteComponent>
-            <DeleteOutlineOutlinedIcon style={{ color: 'gray' }} fontSize="small" />
-          </DeleteComponent>
-          <ActionMenu>
-            <MoreHorizOutlinedIcon style={{ color: 'gray' }} fontSize="small" />
-          </ActionMenu>
-        </ActionBar>
-        <Cover ref={coverRef} className="Card-Cover" />
-        <CardTitle>
-          <span>라인 차트</span>
-        </CardTitle>
-        <Chart height="100%" width="100%" dataSource={countriesInfo}>
-          <CommonSeriesSettings argumentField="country" />
-          {energySources.map((item) => (
-            <Series key={item.value} valueField={item.value} name={item.name} />
-          ))}
-          <Margin bottom={20} />
-          <ArgumentAxis valueMarginsEnabled={false} discreteAxisDivisionMode="crossLabels">
-            <Grid visible />
-          </ArgumentAxis>
-          <Legend verticalAlignment="bottom" horizontalAlignment="center" itemTextPosition="bottom" />
-          <Export enabled />
-          <Title text="Energy Consumption in 2004">
-            <Subtitle text="(Millions of Tons, Oil Equivalent)" />
-          </Title>
-          <Tooltip enabled />
-        </Chart>
-        <ResizeHandle ref={resizeHandleRef} onMouseDown={startResize} />
-      </CardBoard>
-      {isResizing && (
-        <TestDiv
-          ref={resizeCardRef}
-          style={{
-            top: topPx,
-            left: leftPx,
-            width: `${previewSize.previewWidth}px`,
-            height: `${previewSize.previewHeight}px`,
-          }}
-          onMouseMove={resizeMouseMove}
-          onMouseUp={stopResize}
-        >
-          <ResizeHandle />
-        </TestDiv>
-      )}
-      {isResizing && (
-        <ResizePlaceHolder
-          ref={placeholderRef}
-          style={{
-            top: topPx,
-            left: leftPx,
-            width: `${placeholderSize.placeholderWidth}px`,
-            height: `${placeholderSize.placeholderHeight}px`,
-          }}
-          onMouseMove={resizeMouseMove}
-          onMouseUp={stopResize}
-        />
-      )}
-    </>
+    <CardBoard
+      ref={cardBoardRef}
+      className={name}
+      key={name}
+      style={{
+        top: topPx,
+        left: leftPx,
+        width: widthPx,
+        height: heightPx,
+        display: displayState,
+      }}
+      draggable
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <ActionBar ref={actionBarRef}>
+        <DeleteComponent>
+          <DeleteOutlineOutlinedIcon style={{ color: 'gray' }} fontSize="small" />
+        </DeleteComponent>
+        <ActionMenu>
+          <MoreHorizOutlinedIcon style={{ color: 'gray' }} fontSize="small" />
+        </ActionMenu>
+      </ActionBar>
+      <Cover ref={coverRef} className="Card-Cover" />
+      <CardTitle>
+        <span>라인 차트</span>
+      </CardTitle>
+      <Chart height="100%" width="100%" dataSource={countriesInfo}>
+        <CommonSeriesSettings argumentField="country" />
+        {energySources.map((item) => (
+          <Series key={item.value} valueField={item.value} name={item.name} />
+        ))}
+        <Margin bottom={20} />
+        <ArgumentAxis valueMarginsEnabled={false} discreteAxisDivisionMode="crossLabels">
+          <Grid visible />
+        </ArgumentAxis>
+        <Legend verticalAlignment="bottom" horizontalAlignment="center" itemTextPosition="bottom" />
+        <Export enabled />
+        <Title text="Energy Consumption in 2004">
+          <Subtitle text="(Millions of Tons, Oil Equivalent)" />
+        </Title>
+        <Tooltip enabled />
+      </Chart>
+      <ResizeHandle ref={resizeHandleRef} className="resizeHandle" />
+    </CardBoard>
   );
 };
 
