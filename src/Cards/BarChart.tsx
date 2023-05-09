@@ -1,67 +1,69 @@
+import { useRef } from 'react';
 import { Chart, Series } from 'devextreme-react/chart';
+
 import styled from 'styled-components';
 import { dataSource } from './data.js';
+import ActionTools from './ActionTools';
 
 const CardBoard = styled.div`
   border: 1px solid #e1dfdd;
   box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.132), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.108);
-  width: 535px;
-  height: 355px;
   box-sizing: border-box;
   padding: 10px;
   background-color: white;
-  display: block;
   position: absolute;
   border-radius: 2px;
-  cursor: move;
+  transition: height 125ms linear 125ms, width 125ms linear 0s, top 175ms ease-out, left 175ms ease-out,
+    right 175ms ease-out;
+  z-index: 991;
+  min-height: 90px;
+  min-width: 90px;
 `;
 
-const Cover = styled.div`
-  top: 0;
-  left: 0;
+const CardTitle = styled.div`
   width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+  height: auto;
   background-color: none;
-  z-index: 998;
-  position: absolute;
-  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  padding-left: 5px;
 `;
 
-const ResizeHandle = styled.div`
-  height: 14px;
-  width: 14px;
-  bottom: 0px;
-  display: block;
-  padding: 0px 4px 4px 0px;
-  right: 0px;
-  position: absolute;
-  cursor: se-resize;
-  z-index: 999;
-`;
+interface CardPosition {
+  topPx: number;
+  leftPx: number;
+  widthPx: number;
+  heightPx: number;
+  name: string;
+  displayState: string;
+  isPreview: boolean;
+}
 
-const Equip = styled.div`
-  height: 12px;
-  width: 12px;
-  display: block;
-  border-bottom: 1px solid gray;
-  border-right: 1px solid gray;
-  z-index: 999;
-  cursor: se-resize;
-`;
+const BarChart = ({ topPx, name, leftPx, widthPx, heightPx, displayState, isPreview }: CardPosition) => {
+  const cardBoardRef = useRef<HTMLDivElement>(null);
 
-const BarChart = () => {
   return (
-    <CardBoard className="Card" style={{ top: '300px', left: '300px' }} draggable>
-      <Cover className="Card-Cover" />
-      <Chart height="100%" width="100%" id="chart" dataSource={dataSource}>
+    <CardBoard
+      ref={cardBoardRef}
+      className={name}
+      key={name}
+      style={{
+        top: topPx,
+        left: leftPx,
+        width: widthPx,
+        height: heightPx,
+        display: displayState,
+        cursor: isPreview ? 'auto' : 'move',
+      }}
+      draggable
+    >
+      {isPreview ? null : <ActionTools />}
+      <CardTitle>
+        <span>막대 차트</span>
+      </CardTitle>
+      <Chart height="90%" width="100%" id="chart" dataSource={dataSource}>
         <Series valueField="oranges" argumentField="day" name="My oranges" type="bar" color="#ffaa66" />
       </Chart>
-      <ResizeHandle>
-        <Equip />
-      </ResizeHandle>
     </CardBoard>
   );
 };

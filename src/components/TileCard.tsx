@@ -69,19 +69,19 @@ const TileCard = ({ type }: TileCardProps) => {
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
   };
+
   return (
-    <Tile draggable>
-      <Card draggable className={classes} onDragStart={handleDragStart} onDragOver={handleDragOver} onDrop={handleDrop}>
-        <CardMedia style={media} image={testImage} title="Title" />
-        <CardContent>
-          <CardTitle>매트릭 차트</CardTitle>
-          <CardDescription>
-            Azure Monitor의 메트릭은 근 근 실시간 시나리오를 지원하는 경량 메트릭으로, 문제를 알리고 빠르게 감지하는 데
-            특히 유용합니다. 줄바꿈줄바꿈
-          </CardDescription>
-        </CardContent>
-      </Card>
-    </Tile>
+    <Card draggable className={classes} onDragStart={handleDragStart} onDragOver={handleDragOver} onDrop={handleDrop}>
+      <CardMedia style={media} image={testImage} title="Title" />
+      <CardContent>
+        <CardTitle>
+          <strong>{type}</strong>
+        </CardTitle>
+        <CardDescription>
+          {type} 입니다. <br /> 다이나믹 대시보드 프로젝트
+        </CardDescription>
+      </CardContent>
+    </Card>
   );
 };
 

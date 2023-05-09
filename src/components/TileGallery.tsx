@@ -1,13 +1,30 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import styled from 'styled-components';
 import Button from '@mui/material/Button';
 import SearchBox from './SearchBox';
 import TileCard from './TileCard';
 
-type MyComponentProps = {
+interface MyComponentProps {
   handleGalleryVisible: () => void;
-};
+  tileTypes: Array<string>;
+}
+
+interface TileProps {
+  selected: boolean;
+}
+
+const Tile = styled.li<TileProps>`
+  display: flex;
+  font-size: 13px;
+  margin: 0;
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: ${(props) => (props.selected ? 'rgba(0, 0, 0, 0.12)' : 'white')};
+  &:hover {
+    background-color: ${(props) => (!props.selected ? 'rgba(0, 0, 0, 0.05)' : 'rgba(0, 0, 0, 0.12)')};
+  }
+`;
 
 const TileGalleryContents = styled.div`
   /* 스타일 작성 */
@@ -57,12 +74,25 @@ const Close = styled(CloseIcon)(({ theme }) => ({
   padding: '5px',
 }));
 
-const TileGallery = ({ handleGalleryVisible }: MyComponentProps) => {
+const TileGallery = ({ handleGalleryVisible, tileTypes }: MyComponentProps) => {
+  const [selected, setSelected] = useState<number>(-1);
   // 창 닫는 이벤트
   const handleGalleryClose = () => {
     handleGalleryVisible();
   };
-  const tileTypes = ['LineChart', 'BarChart'];
+
+  const handleTileClick = (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
+    const index = parseInt(event.currentTarget.getAttribute('data-index') || '0', 10);
+    console.log(index);
+    console.log(event.currentTarget);
+    setSelected(index);
+  };
+
+  const handleButtonClick = () => {
+    if (selected >= 0) {
+      console.log('추가!');
+    }
+  };
 
   return (
     <TileGalleryContents>
@@ -74,10 +104,18 @@ const TileGallery = ({ handleGalleryVisible }: MyComponentProps) => {
       <SearchBox />
       <TileGalleryBody>
         {tileTypes.map((tileType, index) => (
-          <TileCard key={tileType} type={tileType} />
+          <Tile
+            key={tileType}
+            className={tileType}
+            selected={selected === index}
+            onClick={handleTileClick}
+            data-index={index}
+          >
+            <TileCard key={tileType} type={tileType} />
+          </Tile>
         ))}
       </TileGalleryBody>
-      <Button style={buttonStyle} variant="contained" size="small" color="primary">
+      <Button onClick={handleButtonClick} style={buttonStyle} variant="contained" size="small" color="primary">
         추가
       </Button>
     </TileGalleryContents>

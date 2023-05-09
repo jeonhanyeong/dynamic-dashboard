@@ -54,6 +54,10 @@ const App = () => {
   const [dragTarget, setDragTarget] = useState<HTMLDivElement | null>(null);
   const [galleryVisible, setGalleryVisible] = useState(true);
   const [settingVisible, setSettingVisible] = useState(false);
+  const [tileTypes, setTileTypes] = useState(['LineChart', 'BarChart']);
+  const [dragTargetType, setDragTargetType] = useState<string | undefined>('');
+  const [backgroudVisible, setBackgroudVisible] = useState(true);
+  const [isPreview, setIsPreview] = useState(false);
 
   const handleGalleryVisible = () => {
     setGalleryVisible(!galleryVisible); // 부모 컴포넌트의 상태를 변경
@@ -63,10 +67,20 @@ const App = () => {
     setSettingVisible(!settingVisible); // 부모 컴포넌트의 상태를 변경
   };
 
+  const handlePreview = () => {
+    if (galleryVisible) {
+      setGalleryVisible(!galleryVisible);
+    }
+    console.log(backgroudVisible);
+    setBackgroudVisible(!backgroudVisible);
+    setIsPreview(!isPreview);
+  };
+
   const handleDragStart = (event: DragEvent) => {
     // console.log(e.target.className);
-    setDragTarget(event.target as HTMLDivElement);
-    console.log(event.target);
+    const eventTarget = event.target as HTMLDivElement;
+    setDragTarget(eventTarget);
+    setDragTargetType(tileTypes.find((com) => eventTarget.className.includes(com)));
   };
 
   useEffect(() => {
@@ -83,10 +97,15 @@ const App = () => {
       <TopNavBar handleSettingVisible={handleSettingVisible} />
       <Contents ref={parent}>
         <Dashboard>
-          <DashboardHeader handleGalleryVisible={handleGalleryVisible} />
-          <DashboardBody dragTarget={dragTarget} />
+          <DashboardHeader handleGalleryVisible={handleGalleryVisible} handlePreview={handlePreview} />
+          <DashboardBody
+            dragTarget={dragTarget}
+            dragTargetType={dragTargetType}
+            backgroudVisible={backgroudVisible}
+            isPreview={isPreview}
+          />
         </Dashboard>
-        {galleryVisible && <TileGallery handleGalleryVisible={handleGalleryVisible} />}
+        {galleryVisible && <TileGallery tileTypes={tileTypes} handleGalleryVisible={handleGalleryVisible} />}
         {settingVisible && <ModeSetting />}
       </Contents>
     </WebContainer>
