@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import AddIcon from '@mui/icons-material/Add';
 import styled from 'styled-components';
@@ -138,9 +138,10 @@ const DashboardBody = ({ handleOpenEditDashboard }: MyComponentProps) => {
   const [isSaving, setIsSaving] = useState(true);
   const [clickedDashboardList, setClickedDashboardList] = useState(false);
   const [parsedData, setParsedData] = useState<LocalStorageType[]>([]);
+  const dashboardListRef = useRef<HTMLUListElement>(null);
 
   const handleClickDashboardList = () => {
-    setClickedDashboardList(!clickedDashboardList);
+    setClickedDashboardList((prevState) => !prevState);
   };
 
   const handleEditClick = () => {
@@ -151,23 +152,39 @@ const DashboardBody = ({ handleOpenEditDashboard }: MyComponentProps) => {
     localStorage.removeItem('dashboard');
   };
 
+  const handleMoveToTop = (index: number) => {
+    const newParsedData = [...parsedData];
+    const itemToMove = newParsedData.splice(index, 1)[0];
+    newParsedData.unshift(itemToMove);
+    setParsedData(newParsedData);
+  };
+
+  const handleClickOutsideDashboardList = (event: MouseEvent) => {
+    if (dashboardListRef.current && !dashboardListRef.current.contains(event.target as Node)) {
+      setClickedDashboardList(false);
+    }
+  };
+
   useEffect(() => {
     const storedData = localStorage.getItem('dashboard');
     setParsedData(storedData ? JSON.parse(storedData) : null);
+    document.addEventListener('mousedown', handleClickOutsideDashboardList);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutsideDashboardList);
+    };
   }, []);
 
   return (
     <>
       <ContentTop>
         <DefaultDashboard
-          onClick={parsedData ? handleClickDashboardList : undefined}
-          style={{ pointerEvents: parsedData ? 'auto' : 'none' }}
+          onClick={parsedData && !clickedDashboardList ? handleClickDashboardList : undefined}
+          style={{ pointerEvents: parsedData && !clickedDashboardList ? 'auto' : 'none' }}
         >
-          {parsedData ? (
+          {parsedData && parsedData.length > 0 ? (
             <>
-              <span style={{ fontSize: '20px', fontWeight: 'bold' }}>
-                {parsedData.map((item: LocalStorageType) => item.dashboardTitle)}
-              </span>
+              <span style={{ fontSize: '20px', fontWeight: 'bold' }}>{parsedData[0].dashboardTitle}</span>
               <KeyboardArrowDownIcon fontSize="large" />
             </>
           ) : (
@@ -176,10 +193,10 @@ const DashboardBody = ({ handleOpenEditDashboard }: MyComponentProps) => {
         </DefaultDashboard>
 
         {clickedDashboardList && (
-          <DashboardList>
+          <DashboardList ref={dashboardListRef}>
             {parsedData ? (
-              parsedData.map((item: LocalStorageType) => (
-                <DashboardElement key={item.dashboardTitle}>
+              parsedData.slice(1).map((item: LocalStorageType, index) => (
+                <DashboardElement key={item.dashboardTitle} onClick={() => handleMoveToTop(index + 1)}>
                   <ViewCompactIcon />
                   <span style={{ marginLeft: '10px' }}>{item.dashboardTitle}</span>
                 </DashboardElement>
@@ -214,44 +231,42 @@ const DashboardBody = ({ handleOpenEditDashboard }: MyComponentProps) => {
       </ContentTop>
       <EditDashboard>
         <TileGrid>
-          {parsedData
-            ? parsedData.map((item: LocalStorageType) => {
-                return item.components.map((com: ComponentPosition) => {
-                  if (com.id.includes('LineChart')) {
-                    return (
-                      <LineChart
-                        key={com.id}
-                        name={com.id}
-                        topPx={com.top}
-                        leftPx={com.left}
-                        widthPx={com.width}
-                        heightPx={com.height}
-                        displayState={com.display}
-                        isPreview={isSaving}
-                        handleDelete={null}
-                        handleContext={null}
-                      />
-                    );
-                  }
-                  if (com.id.includes('BarChart')) {
-                    return (
-                      <BarChart
-                        key={com.id}
-                        name={com.id}
-                        topPx={com.top}
-                        leftPx={com.left}
-                        widthPx={com.width}
-                        heightPx={com.height}
-                        displayState={com.display}
-                        isPreview={isSaving}
-                        handleDelete={null}
-                        handleContext={null}
-                      />
-                    );
-                  }
+          {parsedData && parsedData.length > 0
+            ? parsedData[0].components.map((com: ComponentPosition) => {
+                if (com.id.includes('LineChart')) {
+                  return (
+                    <LineChart
+                      key={com.id}
+                      name={com.id}
+                      topPx={com.top}
+                      leftPx={com.left}
+                      widthPx={com.width}
+                      heightPx={com.height}
+                      displayState={com.display}
+                      isPreview={isSaving}
+                      handleDelete={null}
+                      handleContext={null}
+                    />
+                  );
+                }
+                if (com.id.includes('BarChart')) {
+                  return (
+                    <BarChart
+                      key={com.id}
+                      name={com.id}
+                      topPx={com.top}
+                      leftPx={com.left}
+                      widthPx={com.width}
+                      heightPx={com.height}
+                      displayState={com.display}
+                      isPreview={isSaving}
+                      handleDelete={null}
+                      handleContext={null}
+                    />
+                  );
+                }
 
-                  return null;
-                });
+                return null;
               })
             : null}
         </TileGrid>

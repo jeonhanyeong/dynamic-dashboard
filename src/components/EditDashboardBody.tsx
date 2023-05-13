@@ -1,5 +1,8 @@
 import styled from 'styled-components';
 import React, { useState, useEffect, useRef, HTMLAttributes } from 'react';
+import Button from '@mui/material//Button';
+import AddIcon from '@mui/icons-material/Add';
+import TextField from '@mui/material/TextField';
 import LineChart from '../Cards/LineChart';
 import BarChart from '../Cards/BarChart';
 
@@ -15,18 +18,41 @@ interface ComponentPosition {
 interface MyComponentProps extends HTMLAttributes<HTMLDivElement> {
   dragTarget: HTMLDivElement | null;
   dragTargetType: string | undefined;
-  backgroudVisible: boolean;
-  isPreview: boolean;
   selectedTileType: {
     clickedTile: string;
     clickedCount: number;
   };
-  handleEditingDashboard: (data: ComponentPosition[]) => void;
+  handleGalleryVisible: () => void;
+  handleOpenEditDashboard: () => void;
+  handleSaveDashboard: (title: string, components: ComponentPosition[]) => void;
 }
 
 interface TileGridProps {
   backgroundImage: string | null;
 }
+
+const ContentTop = styled.div`
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  width: 100%;
+  height: 50px;
+  padding: 0 25px 0 40px;
+  margin-top: 20px;
+  box-sizing: border-box;
+  justify-content: space-between;
+`;
+const Explain = styled.div`
+  width: 100%;
+  height: 20px;
+  padding: 0 0 0 40px;
+  box-sizing: border-box;
+  display: block;
+`;
+
+const btnStyle = {
+  marginRight: '10px',
+};
 
 const EditDashboard = styled.div`
   z-index: 990;
@@ -43,7 +69,6 @@ const EditDashboard = styled.div`
 
 const TileGrid = styled.div<TileGridProps>`
   display: block;
-
   // background-image: url(https://portal.azure.com/Content/Static//MsPortalImpl/General/FlowLayout_gridShadow.png);
   background-image: ${(props) => (props.backgroundImage ? `url(${props.backgroundImage})` : 'none')};
   background-attachment: scroll;
@@ -102,23 +127,25 @@ interface resizePosition {
   display: string;
 }
 
-const MIN_SIZE = 90; // 카드 사이즈 조절 최소값
 const EditDashboardBody = ({
   dragTarget,
   dragTargetType,
-  backgroudVisible,
-  isPreview,
   selectedTileType,
-  handleEditingDashboard,
+  handleGalleryVisible,
+  handleOpenEditDashboard,
+  handleSaveDashboard,
 }: MyComponentProps) => {
   let draggingTop = 0;
   let draggingLeft = 0;
   let finalResizeWidth = 0;
   let finalResizeHeight = 0;
+  const dashboardTitleRef = useRef<HTMLInputElement>(null);
   const tileGridRef = useRef<HTMLDivElement>(null);
   const dragPlaceholderRef = useRef<HTMLDivElement>(null);
   const resizeCardRef = useRef<HTMLDivElement>(null);
 
+  const [clickPreview, setClickPreview] = useState(true);
+  const [dashboardTitle, setDashboardTitle] = useState('제목 없음');
   const [componentPositions, setComponentPositions] = useState<ComponentPosition[]>([]);
   const [placeholderPosition, setPlaceholderPosition] = useState({
     positionTop: 0,
@@ -141,6 +168,23 @@ const EditDashboardBody = ({
     left: 0,
     display: 'none',
   });
+
+  const galleryOpen = () => {
+    handleGalleryVisible();
+  };
+
+  const handlePreviewClick = () => {
+    setClickPreview((prevClick) => !prevClick);
+  };
+
+  const handleCancleClick = () => {
+    handleOpenEditDashboard();
+  };
+
+  const handleSaveClick = () => {
+    const title = dashboardTitleRef.current as HTMLInputElement;
+    handleSaveDashboard(title.value, componentPositions);
+  };
 
   // 랜덤 id(key) 생성
   const generateId = () => {
@@ -389,7 +433,7 @@ const EditDashboardBody = ({
           widthPx={com.width}
           heightPx={com.height}
           displayState={com.display}
-          isPreview={isPreview}
+          isPreview={!clickPreview}
           handleDelete={handleDeleteComponent}
           handleContext={handleResizeContext}
         />
@@ -405,7 +449,7 @@ const EditDashboardBody = ({
           widthPx={com.width}
           heightPx={com.height}
           displayState={com.display}
-          isPreview={isPreview}
+          isPreview={!clickPreview}
           handleDelete={handleDeleteComponent}
           handleContext={handleResizeContext}
         />
@@ -449,46 +493,106 @@ const EditDashboardBody = ({
     }
   }, [selectedTileType.clickedCount]);
 
-  // 대시보드 컴포넌트가 바뀔때마다 app으로 상태 전송
-  useEffect(() => {
-    handleEditingDashboard(componentPositions);
-  }, [componentPositions]);
-
   return (
-    <EditDashboard>
-      <TileGrid
-        ref={tileGridRef}
-        onMouseDown={isPreview ? undefined : handleMouseDown}
-        backgroundImage={
-          backgroudVisible
-            ? 'https://portal.azure.com/Content/Static//MsPortalImpl/General/FlowLayout_gridShadow.png'
-            : null
-        }
-      >
-        {dashboardComponents}
+    <>
+      <ContentTop>
+        <div style={{ display: 'flex' }}>
+          {clickPreview ? (
+            <TextField
+              inputRef={dashboardTitleRef}
+              placeholder="제목 없음"
+              variant="outlined"
+              size="small"
+              InputProps={{
+                style: {
+                  height: '30px',
+                  fontSize: '15px',
+                  marginRight: '10px',
+                },
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                height: '30px',
+                marginRight: '10px',
+                width: '220px',
+                textOverflow: 'ellipsis',
+                fontSize: '20px',
+                fontWeight: 'bold',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {dashboardTitle}
+            </div>
+          )}
 
-        <TestDiv ref={resizeCardRef} style={resizingComponents}>
-          <h2 style={{ textAlign: 'center', marginTop: '30%', color: 'lightgray' }}>Resizing...</h2>
-          <ResizeHandle />
-        </TestDiv>
-        <ResizePlaceHolder style={resizePlaceholder} />
-        {dragging && (
-          <div
-            ref={dragPlaceholderRef}
-            className="drag-placeholder"
-            style={{
-              width: placeholderPosition.positionWidth,
-              height: placeholderPosition.positionHeight,
-              backgroundColor: 'rgba(0,0,0,0.125)',
-              boxSizing: 'border-box',
-              position: 'absolute',
-              top: placeholderPosition.positionTop,
-              left: placeholderPosition.positionLeft,
-            }}
-          />
+          <Button style={btnStyle} variant="contained" color="primary" size="small" onClick={handleSaveClick}>
+            저장
+          </Button>
+          <Button style={btnStyle} variant="outlined" size="small" onClick={handlePreviewClick}>
+            {clickPreview ? '미리보기' : '편집'}
+          </Button>
+          <Button style={btnStyle} variant="outlined" size="small" onClick={handleCancleClick}>
+            취소
+          </Button>
+          {clickPreview && (
+            <Button
+              style={btnStyle}
+              variant="outlined"
+              color="primary"
+              startIcon={<AddIcon />}
+              size="small"
+              onClick={galleryOpen}
+            >
+              갤러리 열기
+            </Button>
+          )}
+        </div>
+      </ContentTop>
+      <Explain>
+        {clickPreview ? (
+          <span>타일을 크기 조정하거나 이동 또는 편집하거나 대시보드에 추가할 수 있습니다.</span>
+        ) : (
+          <span>미리보기 화면입니다.</span>
         )}
-      </TileGrid>
-    </EditDashboard>
+      </Explain>
+      <EditDashboard>
+        <TileGrid
+          ref={tileGridRef}
+          onMouseDown={clickPreview ? handleMouseDown : undefined}
+          backgroundImage={
+            clickPreview
+              ? 'https://portal.azure.com/Content/Static//MsPortalImpl/General/FlowLayout_gridShadow.png'
+              : null
+          }
+        >
+          {dashboardComponents}
+
+          <TestDiv ref={resizeCardRef} style={resizingComponents}>
+            <h2 style={{ textAlign: 'center', marginTop: '30%', color: 'lightgray' }}>Resizing...</h2>
+            <ResizeHandle />
+          </TestDiv>
+          <ResizePlaceHolder style={resizePlaceholder} />
+          {dragging && (
+            <div
+              ref={dragPlaceholderRef}
+              className="drag-placeholder"
+              style={{
+                width: placeholderPosition.positionWidth,
+                height: placeholderPosition.positionHeight,
+                backgroundColor: 'rgba(0,0,0,0.125)',
+                boxSizing: 'border-box',
+                position: 'absolute',
+                top: placeholderPosition.positionTop,
+                left: placeholderPosition.positionLeft,
+              }}
+            />
+          )}
+        </TileGrid>
+      </EditDashboard>
+    </>
   );
 };
 

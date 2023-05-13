@@ -4,7 +4,6 @@ import { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import TileGallery from './components/TileGallery';
 import TopNavBar from './components/TopNavBar';
-import EditDashboardHeader from './components/EditDashboardHeader';
 import EditDashboardBody from './components/EditDashboardBody';
 import DashboardBody from './components/DashboardBody';
 import ModeSetting from './components/ModeSetting';
@@ -68,7 +67,7 @@ interface ComponentPosition {
 
 interface LocalStorageData {
   dashboardTitle: string;
-  components: object[];
+  components: ComponentPosition[];
 }
 const App = () => {
   const parent = useRef<HTMLDivElement>(null);
@@ -77,18 +76,12 @@ const App = () => {
   const [settingVisible, setSettingVisible] = useState(false);
   const [tileTypes, setTileTypes] = useState(['LineChart', 'BarChart']);
   const [dragTargetType, setDragTargetType] = useState<string | undefined>('');
-  const [backgroudVisible, setBackgroudVisible] = useState(true);
-  const [isPreview, setIsPreview] = useState(false);
   const [isEditDashboard, setIsEditDashboard] = useState(false);
 
   const [selectedTileType, setSelectedTileType] = useState({
     clickedTile: '',
     clickedCount: 0,
   });
-  const [dashboardTitle, setDashboardTitle] = useState<string[]>([]);
-
-  const [saveDashboardComponents, setSaveDashboardComponents] = useState<ComponentPosition[]>([]);
-  const [dc, setDc] = useState<JSX.Element[]>([]);
 
   const addToLocalStorage = (key: string, value: LocalStorageData) => {
     // 기존에 저장된 데이터 가져오기
@@ -100,16 +93,11 @@ const App = () => {
 
       // 새로운 값을 추가
       parsedData.push(value);
-
-      // DashboardHeader에 타이틀 전송
-      setDashboardTitle(parsedData.map((dt: any) => dt.dashboardTitle));
-
       // 변경된 데이터를 문자열로 변환하여 저장
       localStorage.setItem(key, JSON.stringify(parsedData));
     } else {
       // 기존 데이터가 없는 경우, 새로운 배열로 초기화하여 저장
       localStorage.setItem(key, JSON.stringify([value]));
-      setDashboardTitle((prevTitles) => [...prevTitles, value.dashboardTitle]);
     }
   };
 
@@ -119,14 +107,6 @@ const App = () => {
 
   const handleSettingVisible = () => {
     setSettingVisible(!settingVisible); // 부모 컴포넌트의 상태를 변경
-  };
-
-  const handlePreview = () => {
-    if (galleryVisible) {
-      setGalleryVisible(!galleryVisible);
-    }
-    setBackgroudVisible(!backgroudVisible);
-    setIsPreview(!isPreview);
   };
 
   const handleDragStart = (event: DragEvent) => {
@@ -148,14 +128,9 @@ const App = () => {
     setIsEditDashboard(!isEditDashboard);
   };
 
-  // 편집 대시보드에서 편집된 내용들을 저장
-  const handleEditingDashboard = (data: ComponentPosition[]) => {
-    setSaveDashboardComponents(data);
-  };
-
   // 저장 버튼을 눌렀을 때
-  const handleSaveDashboard = (title: string) => {
-    const data = { dashboardTitle: title, components: saveDashboardComponents };
+  const handleSaveDashboard = (title: string, comp: ComponentPosition[]) => {
+    const data = { dashboardTitle: title, components: comp };
     addToLocalStorage('dashboard', data);
 
     if (galleryVisible) {
@@ -185,19 +160,13 @@ const App = () => {
 
         {isEditDashboard && (
           <Dashboard>
-            <EditDashboardHeader
-              handleGalleryVisible={handleGalleryVisible}
-              handlePreview={handlePreview}
-              handleOpenEditDashboard={handleOpenEditDashboard}
-              handleSaveDashboard={handleSaveDashboard}
-            />
             <EditDashboardBody
               dragTarget={dragTarget}
               dragTargetType={dragTargetType}
-              backgroudVisible={backgroudVisible}
-              isPreview={isPreview}
               selectedTileType={selectedTileType}
-              handleEditingDashboard={handleEditingDashboard}
+              handleGalleryVisible={handleGalleryVisible}
+              handleOpenEditDashboard={handleOpenEditDashboard}
+              handleSaveDashboard={handleSaveDashboard}
             />
           </Dashboard>
         )}
