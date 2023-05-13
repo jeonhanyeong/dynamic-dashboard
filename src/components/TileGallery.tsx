@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import styled from 'styled-components';
 import Button from '@mui/material/Button';
@@ -8,6 +8,7 @@ import TileCard from './TileCard';
 interface MyComponentProps {
   handleGalleryVisible: () => void;
   tileTypes: Array<string>;
+  handleAddComponentByClick: (sel: string) => void;
 }
 
 interface TileProps {
@@ -74,7 +75,7 @@ const Close = styled(CloseIcon)(({ theme }) => ({
   padding: '5px',
 }));
 
-const TileGallery = ({ handleGalleryVisible, tileTypes }: MyComponentProps) => {
+const TileGallery = ({ handleGalleryVisible, tileTypes, handleAddComponentByClick }: MyComponentProps) => {
   const [selected, setSelected] = useState<number>(-1);
   // 창 닫는 이벤트
   const handleGalleryClose = () => {
@@ -83,14 +84,14 @@ const TileGallery = ({ handleGalleryVisible, tileTypes }: MyComponentProps) => {
 
   const handleTileClick = (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
     const index = parseInt(event.currentTarget.getAttribute('data-index') || '0', 10);
-    console.log(index);
-    console.log(event.currentTarget);
+
     setSelected(index);
   };
 
   const handleButtonClick = () => {
     if (selected >= 0) {
-      console.log('추가!');
+      const selectedTileType = tileTypes[selected];
+      handleAddComponentByClick(selectedTileType);
     }
   };
 

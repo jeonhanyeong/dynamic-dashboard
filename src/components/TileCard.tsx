@@ -1,18 +1,6 @@
-import { useState } from 'react';
 import styled from 'styled-components';
 import CardMedia from '@mui/material/CardMedia';
 import testImage from '../assets/images/test.png';
-
-const Tile = styled.li`
-  display: flex;
-  font-size: 13px;
-  margin: 0;
-  padding: 10px 20px;
-  cursor: pointer;
-  &:hover {
-    background-color: #dcdcdc;
-  }
-`;
 
 const Card = styled.div`
   display: flex;
@@ -60,7 +48,7 @@ interface TileCardProps {
 const TileCard = ({ type }: TileCardProps) => {
   const classes = `${type} Tile`;
 
-  const handleDragStart = (event: React.DragEvent<HTMLDivElement>) => {
+  const handleDragStart = () => {
     return true;
   };
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {

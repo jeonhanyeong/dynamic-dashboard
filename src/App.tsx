@@ -4,7 +4,8 @@ import { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import TileGallery from './components/TileGallery';
 import TopNavBar from './components/TopNavBar';
-import DashboardHeader from './components/DashboardHeader';
+import EditDashboardHeader from './components/EditDashboardHeader';
+import EditDashboardBody from './components/EditDashboardBody';
 import DashboardBody from './components/DashboardBody';
 import ModeSetting from './components/ModeSetting';
 
@@ -49,15 +50,68 @@ const Dashboard = styled.div`
   overflow: hidden;
 `;
 
+const NoDashboard = styled.div`
+  position: absolute;
+  width: 200px;
+  height: 100px;
+  display: flex;
+  background-color: red;
+`;
+interface ComponentPosition {
+  id: string;
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+  display: string;
+}
+
+interface LocalStorageData {
+  dashboardTitle: string;
+  components: object[];
+}
 const App = () => {
   const parent = useRef<HTMLDivElement>(null);
   const [dragTarget, setDragTarget] = useState<HTMLDivElement | null>(null);
-  const [galleryVisible, setGalleryVisible] = useState(true);
+  const [galleryVisible, setGalleryVisible] = useState(false);
   const [settingVisible, setSettingVisible] = useState(false);
   const [tileTypes, setTileTypes] = useState(['LineChart', 'BarChart']);
   const [dragTargetType, setDragTargetType] = useState<string | undefined>('');
   const [backgroudVisible, setBackgroudVisible] = useState(true);
   const [isPreview, setIsPreview] = useState(false);
+  const [isEditDashboard, setIsEditDashboard] = useState(false);
+
+  const [selectedTileType, setSelectedTileType] = useState({
+    clickedTile: '',
+    clickedCount: 0,
+  });
+  const [dashboardTitle, setDashboardTitle] = useState<string[]>([]);
+
+  const [saveDashboardComponents, setSaveDashboardComponents] = useState<ComponentPosition[]>([]);
+  const [dc, setDc] = useState<JSX.Element[]>([]);
+
+  const addToLocalStorage = (key: string, value: LocalStorageData) => {
+    // 기존에 저장된 데이터 가져오기
+    const existingData = localStorage.getItem(key);
+
+    if (existingData) {
+      // 기존 데이터가 존재하는 경우
+      const parsedData = JSON.parse(existingData);
+
+      // 새로운 값을 추가
+      parsedData.push(value);
+
+      // DashboardHeader에 타이틀 전송
+      setDashboardTitle(parsedData.map((dt: any) => dt.dashboardTitle));
+
+      // 변경된 데이터를 문자열로 변환하여 저장
+      localStorage.setItem(key, JSON.stringify(parsedData));
+    } else {
+      // 기존 데이터가 없는 경우, 새로운 배열로 초기화하여 저장
+      localStorage.setItem(key, JSON.stringify([value]));
+      setDashboardTitle((prevTitles) => [...prevTitles, value.dashboardTitle]);
+    }
+  };
 
   const handleGalleryVisible = () => {
     setGalleryVisible(!galleryVisible); // 부모 컴포넌트의 상태를 변경
@@ -71,7 +125,6 @@ const App = () => {
     if (galleryVisible) {
       setGalleryVisible(!galleryVisible);
     }
-    console.log(backgroudVisible);
     setBackgroudVisible(!backgroudVisible);
     setIsPreview(!isPreview);
   };
@@ -81,6 +134,34 @@ const App = () => {
     const eventTarget = event.target as HTMLDivElement;
     setDragTarget(eventTarget);
     setDragTargetType(tileTypes.find((com) => eventTarget.className.includes(com)));
+  };
+
+  const handleAddComponentByClick = (sel: string) => {
+    setSelectedTileType((prev) => ({
+      ...prev,
+      clickedTile: sel,
+      clickedCount: prev.clickedCount + 1,
+    }));
+  };
+
+  const handleOpenEditDashboard = () => {
+    setIsEditDashboard(!isEditDashboard);
+  };
+
+  // 편집 대시보드에서 편집된 내용들을 저장
+  const handleEditingDashboard = (data: ComponentPosition[]) => {
+    setSaveDashboardComponents(data);
+  };
+
+  // 저장 버튼을 눌렀을 때
+  const handleSaveDashboard = (title: string) => {
+    const data = { dashboardTitle: title, components: saveDashboardComponents };
+    addToLocalStorage('dashboard', data);
+
+    if (galleryVisible) {
+      setGalleryVisible(!galleryVisible);
+    }
+    setIsEditDashboard(!isEditDashboard);
   };
 
   useEffect(() => {
@@ -96,16 +177,37 @@ const App = () => {
     <WebContainer>
       <TopNavBar handleSettingVisible={handleSettingVisible} />
       <Contents ref={parent}>
-        <Dashboard>
-          <DashboardHeader handleGalleryVisible={handleGalleryVisible} handlePreview={handlePreview} />
-          <DashboardBody
-            dragTarget={dragTarget}
-            dragTargetType={dragTargetType}
-            backgroudVisible={backgroudVisible}
-            isPreview={isPreview}
+        {isEditDashboard ? null : (
+          <Dashboard>
+            <DashboardBody handleOpenEditDashboard={handleOpenEditDashboard} />
+          </Dashboard>
+        )}
+
+        {isEditDashboard && (
+          <Dashboard>
+            <EditDashboardHeader
+              handleGalleryVisible={handleGalleryVisible}
+              handlePreview={handlePreview}
+              handleOpenEditDashboard={handleOpenEditDashboard}
+              handleSaveDashboard={handleSaveDashboard}
+            />
+            <EditDashboardBody
+              dragTarget={dragTarget}
+              dragTargetType={dragTargetType}
+              backgroudVisible={backgroudVisible}
+              isPreview={isPreview}
+              selectedTileType={selectedTileType}
+              handleEditingDashboard={handleEditingDashboard}
+            />
+          </Dashboard>
+        )}
+        {galleryVisible && (
+          <TileGallery
+            tileTypes={tileTypes}
+            handleGalleryVisible={handleGalleryVisible}
+            handleAddComponentByClick={handleAddComponentByClick}
           />
-        </Dashboard>
-        {galleryVisible && <TileGallery tileTypes={tileTypes} handleGalleryVisible={handleGalleryVisible} />}
+        )}
         {settingVisible && <ModeSetting />}
       </Contents>
     </WebContainer>

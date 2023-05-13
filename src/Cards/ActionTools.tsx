@@ -1,9 +1,9 @@
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import IconButton from '@mui/material/IconButton';
-import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import styled from 'styled-components';
+import ContextMenu from './ContextMenu';
 
 const Cover = styled.div`
   top: 0;
@@ -23,16 +23,16 @@ const Cover = styled.div`
 `;
 
 const ResizeHandle = styled.div`
-  height: 10px;
-  width: 10px;
+  height: 15px;
+  width: 15px;
   bottom: 5px;
   display: block;
   right: 5px;
   position: absolute;
   cursor: se-resize;
   z-index: 999;
-  border-bottom: 1px solid gray;
-  border-right: 1px solid gray;
+  border-bottom: 2px solid lightgray;
+  border-right: 2px solid lightgray;
 `;
 
 const ActionBar = styled.div`
@@ -47,49 +47,88 @@ const ActionBar = styled.div`
   justify-content: right;
   box-sizing: border-box;
 `;
+interface MyComponentProps {
+  name: string;
+  handleDelete: ((event: React.MouseEvent) => void) | null;
+  handleSelectCard: (dep: number) => void;
+  handleContext: ((name: string, ratioWidth: number, ratioHeight: number) => void) | null;
+}
+interface ContextMenuPosition {
+  state: boolean;
+  top: number;
+  left: number;
+}
 
-const DeleteComponent = styled.div`
-  width: 25px;
-  height: 100%;
-  background-color: none;
-  &:hover {
-    background-color: #a52121;
-    color: white;
-  }
-  cursor: pointer;
-  padding: 2px;
-  box-sizing: border-box;
-`;
+interface StlyeInterface {
+  display: string;
+  opacity: number;
+}
 
-const ActionMenu = styled.div`
-  width: 25px;
-  height: 100%;
-  background-color: none;
-  &:hover {
-    background-color: #bcbcbc;
-  }
-  cursor: pointer;
-  box-sizing: border-box;
-  padding: 2px;
-`;
-
-const ActionTools = () => {
+const ActionTools = ({ name, handleDelete, handleSelectCard, handleContext }: MyComponentProps) => {
   const actionBarRef = useRef<HTMLDivElement>(null);
   const coverRef = useRef<HTMLDivElement>(null);
   const resizeHandleRef = useRef<HTMLDivElement>(null);
+  const [currentRatio, setCurrentRatio] = useState('re-8');
+
+  const [openContextMenu, setOpenContextMenu] = useState<ContextMenuPosition>({
+    state: false,
+    top: 0,
+    left: 0,
+  });
+  const [styleState, setStyleState] = useState<StlyeInterface>({
+    display: 'none',
+    opacity: 0.5,
+  });
 
   const handleMouseEnter = () => {
-    if (actionBarRef.current && coverRef.current) {
-      actionBarRef.current.style.display = 'flex';
-      coverRef.current.style.opacity = '0';
-    }
+    handleSelectCard(1000);
+    setStyleState((prev) => ({
+      ...prev,
+      display: 'flex',
+      opacity: 0,
+    }));
   };
 
   const handleMouseLeave = () => {
-    if (actionBarRef.current && coverRef.current) {
-      actionBarRef.current.style.display = 'none';
-      coverRef.current.style.opacity = '0.5';
+    handleSelectCard(991);
+    setStyleState((prev) => ({
+      ...prev,
+      display: 'none',
+      opacity: 0.5,
+    }));
+    setOpenContextMenu((prev) => ({
+      ...prev,
+      state: false,
+    }));
+  };
+
+  const handleDeleteClick = (event: React.MouseEvent) => {
+    if (handleDelete) {
+      handleDelete(event);
     }
+  };
+
+  const handleContextMenuClick = (event: React.MouseEvent) => {
+    const element = event.currentTarget as HTMLButtonElement;
+
+    const rect = element.getBoundingClientRect();
+    const elementTop = rect.top;
+    const elementLeft = rect.left;
+    const elementWidth = element.offsetWidth;
+    setOpenContextMenu((prev) => ({
+      ...prev,
+      state: !prev.state,
+      top: elementTop - 1,
+      left: elementWidth + elementLeft,
+    }));
+  };
+
+  const handleResizeRatioClick = (id: string) => {
+    setOpenContextMenu((prev) => ({
+      ...prev,
+      state: !prev.state,
+    }));
+    setCurrentRatio(id);
   };
 
   useEffect(() => {
@@ -117,17 +156,34 @@ const ActionTools = () => {
 
   return (
     <>
-      <Cover ref={coverRef} className="Card-Cover" />
-      <ActionBar ref={actionBarRef} className="actionBar">
-        <IconButton
-          style={{ padding: 0, color: 'gray' }}
-          onClick={() => {
-            console.log('야');
-          }}
-        >
-          <DeleteOutlineOutlinedIcon fontSize="small" />
+      <Cover
+        ref={coverRef}
+        className="Card-Cover"
+        style={{
+          opacity: styleState.opacity,
+        }}
+      />
+      <ActionBar
+        ref={actionBarRef}
+        className="actionBar"
+        style={{
+          display: styleState.display,
+        }}
+      >
+        {openContextMenu.state && (
+          <ContextMenu
+            name={name}
+            ContextTop={openContextMenu.top}
+            ContextLeft={openContextMenu.left}
+            handleContext={handleContext}
+            handleResizeRatioClick={handleResizeRatioClick}
+            currentRatio={currentRatio}
+          />
+        )}
+        <IconButton className={name} style={{ padding: 0, color: '#a52121' }} onClick={handleDeleteClick}>
+          <DeleteForeverIcon fontSize="small" />
         </IconButton>
-        <IconButton style={{ padding: 0, color: 'gray' }}>
+        <IconButton className={name} style={{ padding: 0, color: 'gray' }} onClick={handleContextMenuClick}>
           <MoreHorizOutlinedIcon fontSize="small" />
         </IconButton>
       </ActionBar>

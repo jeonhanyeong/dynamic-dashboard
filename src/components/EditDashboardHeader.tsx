@@ -3,11 +3,12 @@ import Button from '@mui/material//Button';
 import AddIcon from '@mui/icons-material/Add';
 import styled from 'styled-components';
 import TextField from '@mui/material/TextField';
-import TileGallery from './TileGallery';
 
 type MyComponentProps = {
   handleGalleryVisible: () => void;
   handlePreview: () => void;
+  handleOpenEditDashboard: () => void;
+  handleSaveDashboard: (title: string) => void;
 };
 
 const ContentTop = styled.div`
@@ -33,10 +34,15 @@ const btnStyle = {
   marginRight: '10px',
 };
 
-const DashboardHeader = ({ handleGalleryVisible, handlePreview }: MyComponentProps) => {
+const EditDashboardHeader = ({
+  handleGalleryVisible,
+  handlePreview,
+  handleOpenEditDashboard,
+  handleSaveDashboard,
+}: MyComponentProps) => {
   const [clickPreview, setClickPreview] = useState(true);
   const [dashboardTitle, setDashboardTitle] = useState('제목 없음');
-  const dashboardTitleRef = useRef<HTMLDivElement>(null);
+  const dashboardTitleRef = useRef<HTMLInputElement>(null);
 
   const galleryOpen = () => {
     handleGalleryVisible();
@@ -47,14 +53,23 @@ const DashboardHeader = ({ handleGalleryVisible, handlePreview }: MyComponentPro
     handlePreview();
   };
 
+  const handleCancleClick = () => {
+    handleOpenEditDashboard();
+  };
+
+  const handleSaveClick = () => {
+    const title = dashboardTitleRef.current as HTMLInputElement;
+    handleSaveDashboard(title.value);
+  };
+
   return (
     <>
       <ContentTop>
         <div style={{ display: 'flex' }}>
           {clickPreview ? (
             <TextField
-              ref={dashboardTitleRef}
-              value={dashboardTitle}
+              inputRef={dashboardTitleRef}
+              placeholder="제목 없음"
               variant="outlined"
               size="small"
               InputProps={{
@@ -82,13 +97,13 @@ const DashboardHeader = ({ handleGalleryVisible, handlePreview }: MyComponentPro
             </div>
           )}
 
-          <Button style={btnStyle} variant="contained" color="primary" size="small">
+          <Button style={btnStyle} variant="contained" color="primary" size="small" onClick={handleSaveClick}>
             저장
           </Button>
           <Button style={btnStyle} variant="outlined" size="small" onClick={handlePreviewClick}>
             {clickPreview ? '미리보기' : '편집'}
           </Button>
-          <Button style={btnStyle} variant="outlined" size="small">
+          <Button style={btnStyle} variant="outlined" size="small" onClick={handleCancleClick}>
             취소
           </Button>
           {clickPreview && (
@@ -116,4 +131,4 @@ const DashboardHeader = ({ handleGalleryVisible, handlePreview }: MyComponentPro
   );
 };
 
-export default DashboardHeader;
+export default EditDashboardHeader;
