@@ -78,6 +78,7 @@ const App = () => {
   const [dragTargetType, setDragTargetType] = useState<string | undefined>('');
   const [isEditDashboard, setIsEditDashboard] = useState(false);
 
+  const [isEditTarget, setIsEditTarget] = useState('');
   const [selectedTileType, setSelectedTileType] = useState({
     clickedTile: '',
     clickedCount: 0,
@@ -124,8 +125,24 @@ const App = () => {
     }));
   };
 
-  const handleOpenEditDashboard = () => {
+  const handleOpenEditDashboard = (editTarget: string | null) => {
+    if (editTarget !== null) {
+      setIsEditTarget(editTarget);
+      setIsEditDashboard(!isEditDashboard);
+    } else {
+      setIsEditTarget('');
+      setIsEditDashboard(!isEditDashboard);
+    }
+  };
+
+  const handleOpenDashboard = () => {
     setIsEditDashboard(!isEditDashboard);
+  };
+
+  const handleIsPreview = () => {
+    if (galleryVisible) {
+      setGalleryVisible(!galleryVisible);
+    }
   };
 
   // 저장 버튼을 눌렀을 때
@@ -133,6 +150,35 @@ const App = () => {
     const data = { dashboardTitle: title, components: comp };
     addToLocalStorage('dashboard', data);
 
+    if (galleryVisible) {
+      setGalleryVisible(!galleryVisible);
+    }
+    setIsEditDashboard(!isEditDashboard);
+  };
+
+  const handleEditSaveDashboard = (editTarget: string, title: string, comp: ComponentPosition[]) => {
+    // LocalStorage에서 이전 데이터 가져오기
+    const storedData = localStorage.getItem('dashboard');
+
+    if (storedData) {
+      // 이전 데이터를 파싱하여 객체로 변환
+      const data = JSON.parse(storedData);
+
+      // title이 일치하는 데이터를 찾아 수정
+      const modifiedData = data.map((item: LocalStorageData) => {
+        if (item.dashboardTitle === editTarget) {
+          return {
+            ...item,
+            dashboardTitle: title,
+            components: comp,
+          };
+        }
+        return item;
+      });
+
+      // 수정된 데이터를 다시 LocalStorage에 저장
+      localStorage.setItem('dashboard', JSON.stringify(modifiedData));
+    }
     if (galleryVisible) {
       setGalleryVisible(!galleryVisible);
     }
@@ -164,9 +210,12 @@ const App = () => {
               dragTarget={dragTarget}
               dragTargetType={dragTargetType}
               selectedTileType={selectedTileType}
+              editTarget={isEditTarget}
               handleGalleryVisible={handleGalleryVisible}
-              handleOpenEditDashboard={handleOpenEditDashboard}
+              handleOpenDashboard={handleOpenDashboard}
               handleSaveDashboard={handleSaveDashboard}
+              handleEditSaveDashboard={handleEditSaveDashboard}
+              handleIsPreview={handleIsPreview}
             />
           </Dashboard>
         )}

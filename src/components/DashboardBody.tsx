@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-
+import { useFullscreen } from 'react-use';
 import AddIcon from '@mui/icons-material/Add';
 import styled from 'styled-components';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -20,7 +20,7 @@ interface ComponentPosition {
 }
 
 interface MyComponentProps {
-  handleOpenEditDashboard: () => void;
+  handleOpenEditDashboard: (editTarget: string | null) => void;
 }
 
 interface LocalStorageType {
@@ -139,13 +139,34 @@ const DashboardBody = ({ handleOpenEditDashboard }: MyComponentProps) => {
   const [clickedDashboardList, setClickedDashboardList] = useState(false);
   const [parsedData, setParsedData] = useState<LocalStorageType[]>([]);
   const dashboardListRef = useRef<HTMLUListElement>(null);
+  const tileGridRef = useRef<HTMLDivElement>(null);
 
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const handleFullscreenButtonClick = () => {
+    if (tileGridRef.current) {
+      const element = tileGridRef.current as HTMLDivElement;
+      if (!isFullscreen) {
+        if (element.requestFullscreen) {
+          element.requestFullscreen();
+        }
+      } else if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+
+      setIsFullscreen((prevState) => !prevState);
+    }
+  };
   const handleClickDashboardList = () => {
     setClickedDashboardList((prevState) => !prevState);
   };
 
+  const handleCreateClick = () => {
+    handleOpenEditDashboard(null);
+  };
+
   const handleEditClick = () => {
-    handleOpenEditDashboard();
+    handleOpenEditDashboard(parsedData[0].dashboardTitle);
   };
 
   const testDelete = () => {
@@ -170,8 +191,14 @@ const DashboardBody = ({ handleOpenEditDashboard }: MyComponentProps) => {
     setParsedData(storedData ? JSON.parse(storedData) : null);
     document.addEventListener('mousedown', handleClickOutsideDashboardList);
 
+    const handleFullscreenChange = () => {
+      setIsFullscreen(document.fullscreenElement !== null);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
     return () => {
       document.removeEventListener('mousedown', handleClickOutsideDashboardList);
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
     };
   }, []);
 
@@ -208,7 +235,7 @@ const DashboardBody = ({ handleOpenEditDashboard }: MyComponentProps) => {
         )}
 
         <ToolBox>
-          <Tool onClick={handleEditClick}>
+          <Tool onClick={handleCreateClick}>
             <AddIcon color="primary" />
             <span style={{ marginLeft: '5px' }}>만들기</span>
           </Tool>
@@ -220,7 +247,7 @@ const DashboardBody = ({ handleOpenEditDashboard }: MyComponentProps) => {
             <DeleteForeverIcon color="primary" />
             <span style={{ marginLeft: '5px' }}>삭제</span>
           </Tool>
-          <Tool>
+          <Tool onClick={handleFullscreenButtonClick}>
             <FullscreenIcon color="primary" />
             <span style={{ marginLeft: '5px' }}>전체 화면</span>
           </Tool>
@@ -230,7 +257,7 @@ const DashboardBody = ({ handleOpenEditDashboard }: MyComponentProps) => {
         </ToolBox>
       </ContentTop>
       <EditDashboard>
-        <TileGrid>
+        <TileGrid ref={tileGridRef}>
           {parsedData && parsedData.length > 0
             ? parsedData[0].components.map((com: ComponentPosition) => {
                 if (com.id.includes('LineChart')) {

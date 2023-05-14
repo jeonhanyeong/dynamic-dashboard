@@ -22,13 +22,20 @@ interface MyComponentProps extends HTMLAttributes<HTMLDivElement> {
     clickedTile: string;
     clickedCount: number;
   };
+  editTarget: string | null;
   handleGalleryVisible: () => void;
-  handleOpenEditDashboard: () => void;
+  handleOpenDashboard: () => void;
   handleSaveDashboard: (title: string, components: ComponentPosition[]) => void;
+  handleEditSaveDashboard: (editTarget: string, title: string, components: ComponentPosition[]) => void;
+  handleIsPreview: () => void;
 }
 
 interface TileGridProps {
   backgroundImage: string | null;
+}
+interface LocalStorageType {
+  dashboardTitle: string;
+  components: ComponentPosition[];
 }
 
 const ContentTop = styled.div`
@@ -131,9 +138,12 @@ const EditDashboardBody = ({
   dragTarget,
   dragTargetType,
   selectedTileType,
+  editTarget,
   handleGalleryVisible,
-  handleOpenEditDashboard,
+  handleOpenDashboard,
   handleSaveDashboard,
+  handleEditSaveDashboard,
+  handleIsPreview,
 }: MyComponentProps) => {
   let draggingTop = 0;
   let draggingLeft = 0;
@@ -143,7 +153,9 @@ const EditDashboardBody = ({
   const tileGridRef = useRef<HTMLDivElement>(null);
   const dragPlaceholderRef = useRef<HTMLDivElement>(null);
   const resizeCardRef = useRef<HTMLDivElement>(null);
+  const previewDashboardTitleRef = useRef<HTMLDivElement>(null);
 
+  const [isEditingMode, setIsEditingMode] = useState(false);
   const [clickPreview, setClickPreview] = useState(true);
   const [dashboardTitle, setDashboardTitle] = useState('제목 없음');
   const [componentPositions, setComponentPositions] = useState<ComponentPosition[]>([]);
@@ -174,16 +186,36 @@ const EditDashboardBody = ({
   };
 
   const handlePreviewClick = () => {
-    setClickPreview((prevClick) => !prevClick);
+    if (clickPreview) {
+      const title = dashboardTitleRef.current as HTMLInputElement | null;
+      if (title) {
+        setClickPreview((prevClick) => !prevClick);
+        handleIsPreview();
+        setDashboardTitle(title.value);
+      }
+    } else {
+      const title = dashboardTitleRef.current as HTMLInputElement;
+      if (title) {
+        title.value = dashboardTitle;
+      }
+      setClickPreview((prevClick) => !prevClick);
+      handleIsPreview();
+    }
   };
 
   const handleCancleClick = () => {
-    handleOpenEditDashboard();
+    handleOpenDashboard();
   };
 
   const handleSaveClick = () => {
-    const title = dashboardTitleRef.current as HTMLInputElement;
-    handleSaveDashboard(title.value, componentPositions);
+    handleSaveDashboard(dashboardTitle, componentPositions);
+  };
+
+  const handleEditSaveClick = () => {
+    console.log(editTarget);
+    if (editTarget !== null) {
+      handleEditSaveDashboard(editTarget, dashboardTitle, componentPositions);
+    }
   };
 
   // 랜덤 id(key) 생성
@@ -493,6 +525,20 @@ const EditDashboardBody = ({
     }
   }, [selectedTileType.clickedCount]);
 
+  useEffect(() => {
+    if (editTarget !== '') {
+      setIsEditingMode((prevMode) => !prevMode);
+      const storedData = localStorage.getItem('dashboard');
+      if (storedData) {
+        const parsedData = JSON.parse(storedData);
+        const targetDashboard = parsedData.find((item: LocalStorageType) => item.dashboardTitle === editTarget);
+        console.log(targetDashboard);
+        setDashboardTitle(targetDashboard.dashboardTitle);
+        setComponentPositions(targetDashboard.components);
+      }
+    }
+  }, [editTarget]);
+
   return (
     <>
       <ContentTop>
@@ -502,6 +548,8 @@ const EditDashboardBody = ({
               inputRef={dashboardTitleRef}
               placeholder="제목 없음"
               variant="outlined"
+              value={dashboardTitle}
+              onChange={(event) => setDashboardTitle(event.target.value)}
               size="small"
               InputProps={{
                 style: {
@@ -513,6 +561,7 @@ const EditDashboardBody = ({
             />
           ) : (
             <div
+              ref={previewDashboardTitleRef}
               style={{
                 height: '30px',
                 marginRight: '10px',
@@ -528,8 +577,14 @@ const EditDashboardBody = ({
             </div>
           )}
 
-          <Button style={btnStyle} variant="contained" color="primary" size="small" onClick={handleSaveClick}>
-            저장
+          <Button
+            style={btnStyle}
+            variant="contained"
+            color="primary"
+            size="small"
+            onClick={isEditingMode ? handleSaveClick : handleEditSaveClick}
+          >
+            {isEditingMode ? '저장 ' : '수정 완료'}
           </Button>
           <Button style={btnStyle} variant="outlined" size="small" onClick={handlePreviewClick}>
             {clickPreview ? '미리보기' : '편집'}
