@@ -536,6 +536,8 @@ const EditDashboardBody = ({
         setDashboardTitle(targetDashboard.dashboardTitle);
         setComponentPositions(targetDashboard.components);
       }
+    } else {
+      setIsEditingMode(false);
     }
   }, [editTarget]);
 
@@ -584,7 +586,7 @@ const EditDashboardBody = ({
             size="small"
             onClick={isEditingMode ? handleSaveClick : handleEditSaveClick}
           >
-            {isEditingMode ? '저장 ' : '수정 완료'}
+            저장
           </Button>
           <Button style={btnStyle} variant="outlined" size="small" onClick={handlePreviewClick}>
             {clickPreview ? '미리보기' : '편집'}

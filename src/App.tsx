@@ -156,6 +156,7 @@ const App = () => {
     setIsEditDashboard(!isEditDashboard);
   };
 
+  // 수정 완료 버튼을 눌렀을 때
   const handleEditSaveDashboard = (editTarget: string, title: string, comp: ComponentPosition[]) => {
     // LocalStorage에서 이전 데이터 가져오기
     const storedData = localStorage.getItem('dashboard');

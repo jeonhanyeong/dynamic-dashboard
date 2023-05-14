@@ -169,6 +169,16 @@ const DashboardBody = ({ handleOpenEditDashboard }: MyComponentProps) => {
     handleOpenEditDashboard(parsedData[0].dashboardTitle);
   };
 
+  const handleDeleteClick = () => {
+    if (parsedData && parsedData.length > 0) {
+      const currentDashboardTitle = parsedData[0].dashboardTitle;
+      const filteredData = parsedData.filter((item) => item.dashboardTitle !== currentDashboardTitle);
+
+      localStorage.setItem('dashboard', JSON.stringify(filteredData));
+      setParsedData(filteredData);
+    }
+  };
+
   const testDelete = () => {
     localStorage.removeItem('dashboard');
   };
@@ -243,7 +253,7 @@ const DashboardBody = ({ handleOpenEditDashboard }: MyComponentProps) => {
             <EditIcon color="primary" />
             <span style={{ marginLeft: '5px' }}>편집</span>
           </Tool>
-          <Tool>
+          <Tool onClick={handleDeleteClick}>
             <DeleteForeverIcon color="primary" />
             <span style={{ marginLeft: '5px' }}>삭제</span>
           </Tool>
