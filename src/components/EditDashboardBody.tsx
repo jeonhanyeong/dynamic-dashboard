@@ -134,6 +134,13 @@ interface resizePosition {
   display: string;
 }
 
+interface placeholderPositionInterface {
+  positionTop: number;
+  positionLeft: number;
+  positionWidth: number;
+  positionHeight: number;
+}
+
 const EditDashboardBody = ({
   dragTarget,
   dragTargetType,
@@ -159,11 +166,11 @@ const EditDashboardBody = ({
   const [clickPreview, setClickPreview] = useState(true);
   const [dashboardTitle, setDashboardTitle] = useState('제목 없음');
   const [componentPositions, setComponentPositions] = useState<ComponentPosition[]>([]);
-  const [placeholderPosition, setPlaceholderPosition] = useState({
+  const [placeholderPosition, setPlaceholderPosition] = useState<placeholderPositionInterface>({
     positionTop: 0,
     positionLeft: 0,
-    positionWidth: 534,
-    positionHeight: 356,
+    positionWidth: 445,
+    positionHeight: 267,
   });
   const [dragging, setDragging] = useState(false);
   const [resizingComponents, setResizingComponents] = useState<resizePosition>({
@@ -225,9 +232,153 @@ const EditDashboardBody = ({
     return randomString + timestamp;
   };
 
+  // 동적 대시보드 위치 조절 함수
+  // 맥시멈 = left: 900, top: 360
+  const autoArrangeElements = (elements: ComponentPosition[], placeholder: placeholderPositionInterface) => {
+    let adjustedComponentPositions = [];
+    const targetComponent = elements[0];
+    const placeholderLeft = placeholder.positionLeft;
+    const placeholderTop = placeholder.positionTop;
+    const placeholderWidth = placeholder.positionWidth;
+    const placeholderHeight = placeholder.positionHeight;
+
+    // 겹침 여부 판단
+    const horizontalOverlap =
+      Math.max(targetComponent.left, placeholderLeft) <
+      Math.min(targetComponent.left + targetComponent.width, placeholderLeft + placeholderWidth);
+    const verticalOverlap =
+      Math.max(targetComponent.top, placeholderTop) <
+      Math.min(targetComponent.top + targetComponent.height, placeholderTop + placeholderHeight);
+    // 겹쳤을 때
+    if (horizontalOverlap && verticalOverlap) {
+      const overlapTop = Math.max(targetComponent.top, placeholderTop);
+      const overlapLeft = Math.max(targetComponent.left, placeholderLeft);
+      const overlapBottom = Math.min(targetComponent.top + targetComponent.height, placeholderTop + placeholderHeight);
+      const overlapRight = Math.min(targetComponent.left + targetComponent.width, placeholderLeft + placeholderWidth);
+
+      const overlapHeight = overlapBottom - overlapTop;
+      const overlapWidth = overlapRight - overlapLeft;
+
+      // console.log('두 개의 div가 면이 겹칩니다.');
+      // console.log('높이 겹침 정도: ', overlapHeight);
+      // console.log('너비 겹침 정도: ', overlapWidth);
+
+      const targetCenterX = targetComponent.left + targetComponent.width / 2;
+      const targetCenterY = targetComponent.top + targetComponent.height / 2;
+      const placeholderCenterX = placeholderLeft + placeholderWidth / 2;
+      const placeholderCenterY = placeholderTop + placeholderHeight / 2;
+
+      const horizontalDistance = targetCenterX - placeholderCenterX;
+      const verticalDistance = targetCenterY - placeholderCenterY;
+
+      if (Math.abs(horizontalDistance) > Math.abs(verticalDistance)) {
+        if (horizontalDistance > 0) {
+          console.log('겹친 방향: 오른쪽');
+          console.log(targetComponent.width);
+          console.log(placeholderWidth);
+          console.log(overlapWidth);
+          setComponentPositions((prevPositions) => {
+            console.log(prevPositions[0].left);
+            if (prevPositions[0].left + overlapWidth > 900) {
+              adjustedComponentPositions = [
+                {
+                  ...prevPositions[0],
+                  left: prevPositions[0].left - targetComponent.width - placeholderWidth + overlapWidth,
+                },
+                ...prevPositions.slice(1), // 기존의 나머지 요소들은 그대로 유지
+              ];
+            } else {
+              adjustedComponentPositions = [
+                {
+                  ...prevPositions[0],
+                  left: prevPositions[0].left + overlapWidth,
+                },
+                ...prevPositions.slice(1), // 기존의 나머지 요소들은 그대로 유지
+              ];
+            }
+
+            return adjustedComponentPositions;
+          });
+        } else {
+          console.log('겹친 방향: 왼쪽');
+          setComponentPositions((prevPositions) => {
+            if (prevPositions[0].left - overlapWidth < 0) {
+              adjustedComponentPositions = [
+                {
+                  ...prevPositions[0],
+                  left: prevPositions[0].left + targetComponent.width + placeholderWidth - overlapWidth,
+                },
+                ...prevPositions.slice(1), // 기존의 나머지 요소들은 그대로 유지
+              ];
+            } else {
+              adjustedComponentPositions = [
+                {
+                  ...prevPositions[0],
+                  left: prevPositions[0].left - overlapWidth,
+                },
+                ...prevPositions.slice(1), // 기존의 나머지 요소들은 그대로 유지
+              ];
+            }
+
+            return adjustedComponentPositions;
+          });
+        }
+      } else if (verticalDistance > 0) {
+        console.log('겹친 방향: 아래');
+        setComponentPositions((prevPositions) => {
+          if (prevPositions[0].top + overlapHeight > 700) {
+            adjustedComponentPositions = [
+              {
+                ...prevPositions[0],
+                top: prevPositions[0].top - targetComponent.height - placeholderHeight + overlapHeight,
+              },
+              ...prevPositions.slice(1), // 기존의 나머지 요소들은 그대로 유지
+            ];
+          } else {
+            adjustedComponentPositions = [
+              {
+                ...prevPositions[0],
+                top: prevPositions[0].top + overlapHeight,
+              },
+              ...prevPositions.slice(1), // 기존의 나머지 요소들은 그대로 유지
+            ];
+          }
+
+          return adjustedComponentPositions;
+        });
+      } else {
+        console.log('겹친 방향: 위');
+        setComponentPositions((prevPositions) => {
+          if (prevPositions[0].top - overlapHeight < 0) {
+            adjustedComponentPositions = [
+              {
+                ...prevPositions[0],
+                top: prevPositions[0].top + targetComponent.height + placeholderHeight - overlapHeight,
+              },
+              ...prevPositions.slice(1), // 기존의 나머지 요소들은 그대로 유지
+            ];
+          } else {
+            adjustedComponentPositions = [
+              {
+                ...prevPositions[0],
+                top: prevPositions[0].top - overlapHeight,
+              },
+              ...prevPositions.slice(1), // 기존의 나머지 요소들은 그대로 유지
+            ];
+          }
+
+          return adjustedComponentPositions;
+        });
+      }
+    } else {
+      console.log('두 개의 div가 면이 겹치지 않습니다.');
+    }
+  };
+
   // 타일을 대시보드로 끌어올 때
   const handleTileDragOver = (event: DragEvent) => {
     event.preventDefault();
+
     const { clientX, clientY } = event; // 마우스의 현재 위치 가져오기
     const tileGrid = event.currentTarget as HTMLDivElement;
     const tileGridRect = tileGrid.getBoundingClientRect();
@@ -239,11 +390,17 @@ const EditDashboardBody = ({
       ...prevDragPosition,
       positionTop: draggingTop,
       positionLeft: draggingLeft,
-      positionHeight: 355,
-      positionWidth: 535,
+      positionHeight: 267,
+      positionWidth: 445,
     }));
     setDragging(true);
   };
+
+  useEffect(() => {
+    if (componentPositions.length > 0) {
+      autoArrangeElements(componentPositions, placeholderPosition);
+    }
+  }, [placeholderPosition.positionTop, placeholderPosition.positionLeft]);
 
   // 타일을 대시보드에 놓았을 때
   const handleTileDrop = (event: DragEvent) => {
@@ -256,8 +413,8 @@ const EditDashboardBody = ({
         id: `${generateId()}-${dragTargetType}`,
         top: draggingTop,
         left: draggingLeft,
-        width: 535,
-        height: 355,
+        width: 445,
+        height: 267,
         display: 'block',
       },
     ]);
@@ -273,7 +430,6 @@ const EditDashboardBody = ({
   };
 
   // 타일 안에 있는 카드 드래그해서 이동시키기
-  // 이거 해결해야함 무조건
   const handleMouseDown = (event: React.MouseEvent) => {
     const target = event.target as HTMLElement;
 
@@ -379,7 +535,6 @@ const EditDashboardBody = ({
           height: finalResizeHeight,
         }));
 
-        // 이거 계산해야함
         setPlaceholderPosition((prevDragPosition) => ({
           ...prevDragPosition,
           positionWidth: Math.ceil(finalResizeWidth / 90) * 90 - 4,
@@ -454,7 +609,7 @@ const EditDashboardBody = ({
   // 대시보드 안의 컴포넌트들
   const dashboardComponents = componentPositions.map((com) => {
     // dragTargetType에 따라 컴포넌트 다르게 해주기
-    // 조금더 좋은 코드가 있을텐데 일단 급하니까.
+    // 근데 조금더 좋은 코드가 있을거같음
     if (com.id.includes('LineChart')) {
       return (
         <LineChart
@@ -491,7 +646,6 @@ const EditDashboardBody = ({
     return false;
   });
 
-  // 마운트 + dragTarget 변경될 때 마다 실행됨
   useEffect(() => {
     const tileComponent = tileGridRef.current as HTMLDivElement;
     if (dragTarget?.className.includes('Tile')) {
@@ -526,13 +680,12 @@ const EditDashboardBody = ({
   }, [selectedTileType.clickedCount]);
 
   useEffect(() => {
-    if (editTarget !== '') {
-      setIsEditingMode((prevMode) => !prevMode);
+    if (editTarget !== '' && editTarget !== null) {
+      setIsEditingMode(true);
       const storedData = localStorage.getItem('dashboard');
       if (storedData) {
         const parsedData = JSON.parse(storedData);
         const targetDashboard = parsedData.find((item: LocalStorageType) => item.dashboardTitle === editTarget);
-        console.log(targetDashboard);
         setDashboardTitle(targetDashboard.dashboardTitle);
         setComponentPositions(targetDashboard.components);
       }
@@ -584,7 +737,7 @@ const EditDashboardBody = ({
             variant="contained"
             color="primary"
             size="small"
-            onClick={isEditingMode ? handleSaveClick : handleEditSaveClick}
+            onClick={isEditingMode ? handleEditSaveClick : handleSaveClick}
           >
             저장
           </Button>

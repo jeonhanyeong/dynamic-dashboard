@@ -78,7 +78,7 @@ const App = () => {
   const [dragTargetType, setDragTargetType] = useState<string | undefined>('');
   const [isEditDashboard, setIsEditDashboard] = useState(false);
 
-  const [isEditTarget, setIsEditTarget] = useState('');
+  const [isEditTarget, setIsEditTarget] = useState<string | null>('');
   const [selectedTileType, setSelectedTileType] = useState({
     clickedTile: '',
     clickedCount: 0,
@@ -130,7 +130,7 @@ const App = () => {
       setIsEditTarget(editTarget);
       setIsEditDashboard(!isEditDashboard);
     } else {
-      setIsEditTarget('');
+      setIsEditTarget(null);
       setIsEditDashboard(!isEditDashboard);
     }
   };
