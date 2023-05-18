@@ -162,6 +162,8 @@ const EditDashboardBody = ({
   const resizeCardRef = useRef<HTMLDivElement>(null);
   const previewDashboardTitleRef = useRef<HTMLDivElement>(null);
 
+  const [autoMovingClickedElement, setAutoMovingClickedElement] = useState<HTMLDivElement | null>();
+
   const [isEditingMode, setIsEditingMode] = useState(false);
   const [clickPreview, setClickPreview] = useState(true);
   const [dashboardTitle, setDashboardTitle] = useState('제목 없음');
@@ -219,7 +221,7 @@ const EditDashboardBody = ({
   };
 
   const handleEditSaveClick = () => {
-    console.log(editTarget);
+    // console.log(editTarget);
     if (editTarget !== null) {
       handleEditSaveDashboard(editTarget, dashboardTitle, componentPositions);
     }
@@ -233,152 +235,105 @@ const EditDashboardBody = ({
   };
 
   // 동적 대시보드 위치 조절 함수
-  // 맥시멈 = left: 900, top: 360
+  // 맥시멈(일단 처음에 보여지는 화면 크기(타일갤러리 제외)) = left: 900, top: 360
+  // 수정1) 현재는 placeholder의 위치에 대해서만 컴포넌트의 위치가 변경이 됌
+  // 수정2_Todo) placeholder의 위치와 다른 컴포넌트의 위치도 감지해서 안겹치게 이동해야됌(최종)
   const autoArrangeElements = (elements: ComponentPosition[], placeholder: placeholderPositionInterface) => {
-    let adjustedComponentPositions = [];
-    const targetComponent = elements[0];
     const placeholderLeft = placeholder.positionLeft;
     const placeholderTop = placeholder.positionTop;
     const placeholderWidth = placeholder.positionWidth;
     const placeholderHeight = placeholder.positionHeight;
 
-    // 겹침 여부 판단
-    const horizontalOverlap =
-      Math.max(targetComponent.left, placeholderLeft) <
-      Math.min(targetComponent.left + targetComponent.width, placeholderLeft + placeholderWidth);
-    const verticalOverlap =
-      Math.max(targetComponent.top, placeholderTop) <
-      Math.min(targetComponent.top + targetComponent.height, placeholderTop + placeholderHeight);
-    // 겹쳤을 때
-    if (horizontalOverlap && verticalOverlap) {
-      const overlapTop = Math.max(targetComponent.top, placeholderTop);
-      const overlapLeft = Math.max(targetComponent.left, placeholderLeft);
-      const overlapBottom = Math.min(targetComponent.top + targetComponent.height, placeholderTop + placeholderHeight);
-      const overlapRight = Math.min(targetComponent.left + targetComponent.width, placeholderLeft + placeholderWidth);
-
-      const overlapHeight = overlapBottom - overlapTop;
-      const overlapWidth = overlapRight - overlapLeft;
-
-      // console.log('두 개의 div가 면이 겹칩니다.');
-      // console.log('높이 겹침 정도: ', overlapHeight);
-      // console.log('너비 겹침 정도: ', overlapWidth);
-
-      const targetCenterX = targetComponent.left + targetComponent.width / 2;
-      const targetCenterY = targetComponent.top + targetComponent.height / 2;
-      const placeholderCenterX = placeholderLeft + placeholderWidth / 2;
-      const placeholderCenterY = placeholderTop + placeholderHeight / 2;
-
-      const horizontalDistance = targetCenterX - placeholderCenterX;
-      const verticalDistance = targetCenterY - placeholderCenterY;
-
-      if (Math.abs(horizontalDistance) > Math.abs(verticalDistance)) {
-        if (horizontalDistance > 0) {
-          console.log('겹친 방향: 오른쪽');
-          console.log(targetComponent.width);
-          console.log(placeholderWidth);
-          console.log(overlapWidth);
-          setComponentPositions((prevPositions) => {
-            console.log(prevPositions[0].left);
-            if (prevPositions[0].left + overlapWidth > 900) {
-              adjustedComponentPositions = [
-                {
-                  ...prevPositions[0],
-                  left: prevPositions[0].left - targetComponent.width - placeholderWidth + overlapWidth,
-                },
-                ...prevPositions.slice(1), // 기존의 나머지 요소들은 그대로 유지
-              ];
-            } else {
-              adjustedComponentPositions = [
-                {
-                  ...prevPositions[0],
-                  left: prevPositions[0].left + overlapWidth,
-                },
-                ...prevPositions.slice(1), // 기존의 나머지 요소들은 그대로 유지
-              ];
-            }
-
-            return adjustedComponentPositions;
-          });
-        } else {
-          console.log('겹친 방향: 왼쪽');
-          setComponentPositions((prevPositions) => {
-            if (prevPositions[0].left - overlapWidth < 0) {
-              adjustedComponentPositions = [
-                {
-                  ...prevPositions[0],
-                  left: prevPositions[0].left + targetComponent.width + placeholderWidth - overlapWidth,
-                },
-                ...prevPositions.slice(1), // 기존의 나머지 요소들은 그대로 유지
-              ];
-            } else {
-              adjustedComponentPositions = [
-                {
-                  ...prevPositions[0],
-                  left: prevPositions[0].left - overlapWidth,
-                },
-                ...prevPositions.slice(1), // 기존의 나머지 요소들은 그대로 유지
-              ];
-            }
-
-            return adjustedComponentPositions;
-          });
-        }
-      } else if (verticalDistance > 0) {
-        console.log('겹친 방향: 아래');
-        setComponentPositions((prevPositions) => {
-          if (prevPositions[0].top + overlapHeight > 700) {
-            adjustedComponentPositions = [
-              {
-                ...prevPositions[0],
-                top: prevPositions[0].top - targetComponent.height - placeholderHeight + overlapHeight,
-              },
-              ...prevPositions.slice(1), // 기존의 나머지 요소들은 그대로 유지
-            ];
-          } else {
-            adjustedComponentPositions = [
-              {
-                ...prevPositions[0],
-                top: prevPositions[0].top + overlapHeight,
-              },
-              ...prevPositions.slice(1), // 기존의 나머지 요소들은 그대로 유지
-            ];
-          }
-
-          return adjustedComponentPositions;
-        });
-      } else {
-        console.log('겹친 방향: 위');
-        setComponentPositions((prevPositions) => {
-          if (prevPositions[0].top - overlapHeight < 0) {
-            adjustedComponentPositions = [
-              {
-                ...prevPositions[0],
-                top: prevPositions[0].top + targetComponent.height + placeholderHeight - overlapHeight,
-              },
-              ...prevPositions.slice(1), // 기존의 나머지 요소들은 그대로 유지
-            ];
-          } else {
-            adjustedComponentPositions = [
-              {
-                ...prevPositions[0],
-                top: prevPositions[0].top - overlapHeight,
-              },
-              ...prevPositions.slice(1), // 기존의 나머지 요소들은 그대로 유지
-            ];
-          }
-
-          return adjustedComponentPositions;
-        });
+    const overlapResults = elements.map((element, index) => {
+      const updatedElement = { ...element }; // 객체의 복사본 생성
+      if (autoMovingClickedElement?.className.includes(element.id)) {
+        return updatedElement;
       }
-    } else {
-      console.log('두 개의 div가 면이 겹치지 않습니다.');
-    }
+
+      const horizontalOverlap =
+        Math.max(element.left, placeholderLeft) <
+        Math.min(element.left + element.width, placeholderLeft + placeholderWidth);
+      const verticalOverlap =
+        Math.max(element.top, placeholderTop) <
+        Math.min(element.top + element.height, placeholderTop + placeholderHeight);
+
+      if (horizontalOverlap && verticalOverlap) {
+        const overlapTop = Math.max(element.top, placeholderTop);
+        const overlapLeft = Math.max(element.left, placeholderLeft);
+        const overlapBottom = Math.min(element.top + element.height, placeholderTop + placeholderHeight);
+        const overlapRight = Math.min(element.left + element.width, placeholderLeft + placeholderWidth);
+
+        const overlapHeight = Math.ceil((overlapBottom - overlapTop) / 10) * 10;
+        const overlapWidth = Math.round((overlapRight - overlapLeft) / 10) * 10;
+
+        console.log('height', overlapHeight);
+        console.log('width', overlapWidth);
+
+        const targetCenterX = element.left + element.width / 2;
+        const targetCenterY = element.top + element.height / 2;
+        const placeholderCenterX = placeholderLeft + placeholderWidth / 2;
+        const placeholderCenterY = placeholderTop + placeholderHeight / 2;
+
+        const horizontalDistance = targetCenterX - placeholderCenterX;
+        const verticalDistance = targetCenterY - placeholderCenterY;
+
+        if (Math.abs(horizontalDistance) > Math.abs(verticalDistance)) {
+          if (horizontalDistance > 0) {
+            // console.log('겹친 방향: 오른쪽', element);
+            if (updatedElement.left + overlapWidth > 900) {
+              if (element.left - element.width - placeholderWidth + overlapWidth < 0) {
+                // console.log('엥');
+                updatedElement.left += overlapWidth;
+                return updatedElement;
+              }
+              updatedElement.left = element.left - element.width - placeholderWidth + overlapWidth - 10;
+              return updatedElement;
+            }
+            updatedElement.left += overlapWidth;
+            return updatedElement;
+          }
+
+          if (updatedElement.left - overlapWidth < 0) {
+            // console.log('겹친 방향: 왼쪽', element);
+            updatedElement.left = element.left + element.width + placeholderWidth - overlapWidth + 10;
+            return updatedElement;
+          }
+          updatedElement.left -= overlapWidth;
+          return updatedElement;
+        }
+
+        if (verticalDistance > 0) {
+          if (updatedElement.top + overlapHeight > 700) {
+            // console.log('겹친 방향: 아래');
+            if (updatedElement.top - updatedElement.height - placeholderHeight + overlapHeight < 0) {
+              updatedElement.top += overlapHeight;
+              return updatedElement;
+            }
+            updatedElement.top = updatedElement.top - updatedElement.height - placeholderHeight + overlapHeight - 6;
+            // console.log(updatedElement.top - updatedElement.height - placeholderHeight + overlapHeight);
+            return updatedElement;
+          }
+          updatedElement.top += overlapHeight;
+          return updatedElement;
+        }
+
+        if (updatedElement.top - overlapHeight < 0) {
+          // console.log('겹친 방향: 위');
+          updatedElement.top = updatedElement.top + updatedElement.height + placeholderHeight - overlapHeight + 6;
+          return updatedElement;
+        }
+        updatedElement.top -= overlapHeight;
+        return updatedElement;
+      }
+      return updatedElement;
+    });
+    setComponentPositions(overlapResults);
   };
 
   // 타일을 대시보드로 끌어올 때
   const handleTileDragOver = (event: DragEvent) => {
     event.preventDefault();
-
+    setAutoMovingClickedElement(dragTarget);
     const { clientX, clientY } = event; // 마우스의 현재 위치 가져오기
     const tileGrid = event.currentTarget as HTMLDivElement;
     const tileGridRect = tileGrid.getBoundingClientRect();
@@ -395,12 +350,6 @@ const EditDashboardBody = ({
     }));
     setDragging(true);
   };
-
-  useEffect(() => {
-    if (componentPositions.length > 0) {
-      autoArrangeElements(componentPositions, placeholderPosition);
-    }
-  }, [placeholderPosition.positionTop, placeholderPosition.positionLeft]);
 
   // 타일을 대시보드에 놓았을 때
   const handleTileDrop = (event: DragEvent) => {
@@ -434,6 +383,7 @@ const EditDashboardBody = ({
     const target = event.target as HTMLElement;
 
     const cardInDashboard = target.parentElement as HTMLDivElement;
+    setAutoMovingClickedElement(cardInDashboard);
     const initialTop = parseInt(cardInDashboard.style.top, 10);
     const initialLeft = parseInt(cardInDashboard.style.left, 10);
     const initialWidth = parseInt(cardInDashboard.style.width, 10);
@@ -466,19 +416,23 @@ const EditDashboardBody = ({
       // 드랍
       const handleCardDrop = (upEvent: DragEvent) => {
         const upComponent = target.parentElement as HTMLDivElement;
-        const updatedComponentPositions = componentPositions.map((com) => {
-          if (upComponent.className.includes(com.id)) {
-            return {
-              ...com,
-              top: com.top + draggingTop > 0 ? com.top + draggingTop : 0,
-              left: com.left + draggingLeft > 0 ? com.left + draggingLeft : 0,
-            };
-          }
-          return com;
-        });
         setDragging(false);
         cardInDashboard.style.opacity = '1';
-        setComponentPositions(updatedComponentPositions);
+        setComponentPositions((prevComponentPositions) => {
+          const update = prevComponentPositions.map((com) => {
+            if (upComponent.className.includes(com.id)) {
+              return {
+                ...com,
+                top: com.top + draggingTop > 0 ? com.top + draggingTop : 0,
+                left: com.left + draggingLeft > 0 ? com.left + draggingLeft : 0,
+              };
+            }
+            return com;
+          });
+
+          return update;
+        });
+        // setComponentPositions(updatedComponentPositions);
         document.removeEventListener('dragover', handleCardDragOver);
         document.removeEventListener('dragleave', handleCardDragLeave);
         document.removeEventListener('drop', handleCardDrop);
@@ -661,6 +615,13 @@ const EditDashboardBody = ({
       tileComponent.removeEventListener('dragleave', handleTileDragLeave);
     };
   }, [dragTarget]);
+
+  // 카드 자동 위치 조정
+  useEffect(() => {
+    if (componentPositions.length > 0) {
+      autoArrangeElements(componentPositions, placeholderPosition);
+    }
+  }, [placeholderPosition.positionTop, placeholderPosition.positionLeft]);
 
   // 타일 갤러리에서 클릭 후 추가 버튼으로 컴포넌트 추가하기
   useEffect(() => {
