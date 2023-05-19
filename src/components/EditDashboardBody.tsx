@@ -5,6 +5,10 @@ import AddIcon from '@mui/icons-material/Add';
 import TextField from '@mui/material/TextField';
 import LineChart from '../Cards/LineChart';
 import BarChart from '../Cards/BarChart';
+import MonthlyActiveUser from '../Cards/MonthlyActiveUser';
+import ActiveUsers from '../Cards/ActiveUsers';
+import UserList from '../Cards/UserList';
+import ServerTime from '../Cards/ServerTime';
 
 interface ComponentPosition {
   id: string;
@@ -154,6 +158,8 @@ const EditDashboardBody = ({
 }: MyComponentProps) => {
   let draggingTop = 0;
   let draggingLeft = 0;
+  let heightOfType = 0;
+  let WidthOfType = 0;
   let finalResizeWidth = 0;
   let finalResizeHeight = 0;
   const dashboardTitleRef = useRef<HTMLInputElement>(null);
@@ -340,13 +346,33 @@ const EditDashboardBody = ({
     // 90px 간격으로 맞춤
     draggingTop = Math.round((clientY - tileGridRect.top) / 90) * 90;
     draggingLeft = Math.round((clientX - tileGridRect.left) / 90) * 90;
+
+    if (
+      dragTarget?.className.includes('MAU by month in the last 5 months') ||
+      dragTarget?.className.includes('Number of connections by application in the last 20 days')
+    ) {
+      heightOfType = 356; // 4칸
+      WidthOfType = 534; // 4칸
+    } else if (
+      dragTarget?.className.includes('Active Users') ||
+      dragTarget?.className.includes('Monthly Active User')
+    ) {
+      heightOfType = 178; // 2칸
+      WidthOfType = 178;
+    } else if (dragTarget?.className.includes('Server Time')) {
+      heightOfType = 178; // 3칸
+      WidthOfType = 267; // 5칸
+    } else {
+      heightOfType = 267; // 3칸
+      WidthOfType = 445; // 5칸
+    }
     // 회색배경(placeholder)포지션
     setPlaceholderPosition((prevDragPosition) => ({
       ...prevDragPosition,
       positionTop: draggingTop,
       positionLeft: draggingLeft,
-      positionHeight: 267,
-      positionWidth: 445,
+      positionHeight: heightOfType,
+      positionWidth: WidthOfType,
     }));
     setDragging(true);
   };
@@ -362,8 +388,8 @@ const EditDashboardBody = ({
         id: `${generateId()}-${dragTargetType}`,
         top: draggingTop,
         left: draggingLeft,
-        width: 445,
-        height: 267,
+        width: WidthOfType,
+        height: heightOfType,
         display: 'block',
       },
     ]);
@@ -564,7 +590,72 @@ const EditDashboardBody = ({
   const dashboardComponents = componentPositions.map((com) => {
     // dragTargetType에 따라 컴포넌트 다르게 해주기
     // 근데 조금더 좋은 코드가 있을거같음
-    if (com.id.includes('LineChart')) {
+    if (com.id.includes('Active Users')) {
+      return (
+        <ActiveUsers
+          key={com.id}
+          name={com.id}
+          topPx={com.top}
+          leftPx={com.left}
+          widthPx={com.width}
+          heightPx={com.height}
+          displayState={com.display}
+          isPreview={!clickPreview}
+          handleDelete={handleDeleteComponent}
+          handleContext={handleResizeContext}
+        />
+      );
+    }
+    if (com.id.includes('Monthly Active User')) {
+      return (
+        <MonthlyActiveUser
+          key={com.id}
+          name={com.id}
+          topPx={com.top}
+          leftPx={com.left}
+          widthPx={com.width}
+          heightPx={com.height}
+          displayState={com.display}
+          isPreview={!clickPreview}
+          handleDelete={handleDeleteComponent}
+          handleContext={handleResizeContext}
+        />
+      );
+    }
+    if (com.id.includes('User List')) {
+      return (
+        <UserList
+          key={com.id}
+          name={com.id}
+          topPx={com.top}
+          leftPx={com.left}
+          widthPx={com.width}
+          heightPx={com.height}
+          displayState={com.display}
+          isPreview={!clickPreview}
+          handleDelete={handleDeleteComponent}
+          handleContext={handleResizeContext}
+        />
+      );
+    }
+    if (com.id.includes('Server Time')) {
+      return (
+        <ServerTime
+          key={com.id}
+          name={com.id}
+          topPx={com.top}
+          leftPx={com.left}
+          widthPx={com.width}
+          heightPx={com.height}
+          displayState={com.display}
+          isPreview={!clickPreview}
+          handleDelete={handleDeleteComponent}
+          handleContext={handleResizeContext}
+        />
+      );
+    }
+
+    if (com.id.includes('Number of connections by application in the last 20 days')) {
       return (
         <LineChart
           key={com.id}
@@ -580,7 +671,7 @@ const EditDashboardBody = ({
         />
       );
     }
-    if (com.id.includes('BarChart')) {
+    if (com.id.includes('MAU by month in the last 5 months')) {
       return (
         <BarChart
           key={com.id}
@@ -626,14 +717,33 @@ const EditDashboardBody = ({
   // 타일 갤러리에서 클릭 후 추가 버튼으로 컴포넌트 추가하기
   useEffect(() => {
     if (selectedTileType.clickedTile !== '') {
+      if (
+        selectedTileType.clickedTile === 'MAU by month in the last 5 months' ||
+        selectedTileType.clickedTile === 'Number of connections by application in the last 20 days'
+      ) {
+        heightOfType = 356; // 4칸
+        WidthOfType = 534; // 4칸
+      } else if (
+        selectedTileType.clickedTile === 'Active Users' ||
+        selectedTileType.clickedTile === 'Monthly Active User'
+      ) {
+        heightOfType = 178; // 2칸
+        WidthOfType = 178;
+      } else if (selectedTileType.clickedTile === 'Server Time') {
+        heightOfType = 178; // 3칸
+        WidthOfType = 267; // 5칸
+      } else {
+        heightOfType = 267; // 3칸
+        WidthOfType = 445; // 5칸
+      }
       setComponentPositions((prevComponentPositions) => [
         ...prevComponentPositions,
         {
           id: `${generateId()}-${selectedTileType.clickedTile}`,
           top: 0,
           left: 0,
-          width: 535,
-          height: 355,
+          width: WidthOfType,
+          height: heightOfType,
           display: 'block',
         },
       ]);

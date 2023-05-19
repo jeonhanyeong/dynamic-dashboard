@@ -1,9 +1,6 @@
-import { useRef, useState } from 'react';
-import { Chart, Series } from 'devextreme-react/chart';
-
+import { useRef, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import ActionTools from './ActionTools';
-import { dataSource } from './data.js';
 
 const CardBoard = styled.div`
   border: 1px solid #e1dfdd;
@@ -13,6 +10,7 @@ const CardBoard = styled.div`
   background-color: white;
   position: absolute;
   border-radius: 2px;
+
   transition: height 125ms linear 125ms, width 125ms linear 0s, top 175ms ease-out, left 175ms ease-out,
     right 175ms ease-out;
   z-index: 991;
@@ -41,7 +39,16 @@ interface CardPosition {
   handleContext: ((name: string, ratioWidth: number, ratioHeight: number) => void) | null;
 }
 
-const BarChart = ({
+interface TimeInfo {
+  year: number;
+  month: string;
+  day: string;
+  hours: string;
+  minutes: string;
+  seconds: string;
+}
+
+const ServerTime = ({
   topPx,
   name,
   leftPx,
@@ -55,9 +62,46 @@ const BarChart = ({
   const cardBoardRef = useRef<HTMLDivElement>(null);
   const [depth, setDepth] = useState(991);
 
+  const [timer, setTimer] = useState<TimeInfo>({
+    year: 0,
+    month: '0',
+    day: '0',
+    hours: '0',
+    minutes: '0',
+    seconds: '0',
+  });
+  const [fontRatio, setFontRatio] = useState(0);
+
   const handleSelectCard = (dep: number) => {
     setDepth(dep);
   };
+
+  const currentTimer = () => {
+    const date = new Date();
+    let hours = date.getHours();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+
+    // 12시간 형식으로 변경
+    hours = hours % 12 || 12;
+
+    const updateCurrentTime = { ...timer };
+    updateCurrentTime.year = date.getFullYear();
+    updateCurrentTime.month = String(date.getMonth() + 1).padStart(2, '0');
+    updateCurrentTime.day = String(date.getDate()).padStart(2, '0');
+    updateCurrentTime.hours = String(date.getHours()).padStart(2, '0');
+    updateCurrentTime.minutes = String(date.getMinutes()).padStart(2, '0');
+    updateCurrentTime.seconds = String(date.getSeconds()).padStart(2, '0');
+    setTimer(updateCurrentTime);
+  };
+
+  const startTimer = () => {
+    setInterval(currentTimer, 1000);
+  };
+  startTimer();
+
+  useEffect(() => {
+    setFontRatio(Math.floor(widthPx / 6));
+  }, [widthPx]);
   return (
     <CardBoard
       ref={cardBoardRef}
@@ -82,14 +126,27 @@ const BarChart = ({
           handleContext={handleContext}
         />
       )}
+
       <CardTitle>
-        <span>최근 5개월 간 월별 활성 유저 수</span>
+        <span>서버 시간</span>
       </CardTitle>
-      <Chart height="90%" width="100%" id="chart" dataSource={dataSource}>
-        <Series valueField="oranges" argumentField="day" name="My oranges" type="bar" color="#ffaa66" />
-      </Chart>
+      <div
+        style={{
+          height: '100%',
+          width: '100%',
+          justifyContent: 'center',
+          display: 'flex',
+          alignItems: 'center',
+          flexDirection: 'column',
+        }}
+      >
+        <span style={{ fontSize: fontRatio, marginBottom: '10px' }}>
+          <strong>{`${timer.hours}:${timer.minutes}:${timer.seconds}`}</strong>
+        </span>
+        <span style={{ fontSize: fontRatio / 3.5 }}>{`${timer.year}년 ${timer.month}월 ${timer.day}일`}</span>
+      </div>
     </CardBoard>
   );
 };
 
-export default BarChart;
+export default ServerTime;

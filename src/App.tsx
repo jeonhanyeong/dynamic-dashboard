@@ -69,12 +69,42 @@ interface LocalStorageData {
   dashboardTitle: string;
   components: ComponentPosition[];
 }
+
+interface TileInfo {
+  title: string;
+  description: string;
+}
 const App = () => {
   const parent = useRef<HTMLDivElement>(null);
   const [dragTarget, setDragTarget] = useState<HTMLDivElement | null>(null);
   const [galleryVisible, setGalleryVisible] = useState(false);
   const [settingVisible, setSettingVisible] = useState(false);
-  const [tileTypes, setTileTypes] = useState(['LineChart', 'BarChart']);
+  const [tileTypes, setTileTypes] = useState<TileInfo[]>([
+    {
+      title: 'Active Users',
+      description: '활성 유저 수',
+    },
+    {
+      title: 'Monthly Active User',
+      description: '월별 활성 유저 수',
+    },
+    {
+      title: 'MAU by month in the last 5 months',
+      description: '최근 5개월 간 월별 활성 유저 수',
+    },
+    {
+      title: 'Number of connections by application in the last 20 days',
+      description: '최근 20일 간 일자별 애플리케이션별 접속 수',
+    },
+    {
+      title: 'User List',
+      description: '유저 리스트',
+    },
+    {
+      title: 'Server Time',
+      description: '서버 시간',
+    },
+  ]);
   const [dragTargetType, setDragTargetType] = useState<string | undefined>('');
   const [isEditDashboard, setIsEditDashboard] = useState(false);
 
@@ -114,13 +144,14 @@ const App = () => {
     // console.log(e.target.className);
     const eventTarget = event.target as HTMLDivElement;
     setDragTarget(eventTarget);
-    setDragTargetType(tileTypes.find((com) => eventTarget.className.includes(com)));
+    const foundTile = tileTypes.find((tileInfo) => eventTarget.className.includes(tileInfo.title));
+    setDragTargetType(foundTile?.title);
   };
 
-  const handleAddComponentByClick = (sel: string) => {
+  const handleAddComponentByClick = (sel: TileInfo) => {
     setSelectedTileType((prev) => ({
       ...prev,
-      clickedTile: sel,
+      clickedTile: sel.title,
       clickedCount: prev.clickedCount + 1,
     }));
   };

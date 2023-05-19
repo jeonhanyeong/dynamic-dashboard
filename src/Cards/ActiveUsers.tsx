@@ -1,9 +1,7 @@
-import { useRef, useState } from 'react';
-import { Chart, Series } from 'devextreme-react/chart';
-
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import PortraitIcon from '@mui/icons-material/Portrait';
 import ActionTools from './ActionTools';
-import { dataSource } from './data.js';
 
 const CardBoard = styled.div`
   border: 1px solid #e1dfdd;
@@ -13,6 +11,7 @@ const CardBoard = styled.div`
   background-color: white;
   position: absolute;
   border-radius: 2px;
+
   transition: height 125ms linear 125ms, width 125ms linear 0s, top 175ms ease-out, left 175ms ease-out,
     right 175ms ease-out;
   z-index: 991;
@@ -27,6 +26,8 @@ const CardTitle = styled.div`
   font-size: 14px;
   font-weight: bold;
   padding-left: 5px;
+  display: flex;
+  align-items: center;
 `;
 
 interface CardPosition {
@@ -41,7 +42,7 @@ interface CardPosition {
   handleContext: ((name: string, ratioWidth: number, ratioHeight: number) => void) | null;
 }
 
-const BarChart = ({
+const ActiveUser = ({
   topPx,
   name,
   leftPx,
@@ -54,10 +55,14 @@ const BarChart = ({
 }: CardPosition) => {
   const cardBoardRef = useRef<HTMLDivElement>(null);
   const [depth, setDepth] = useState(991);
+  const [fontRatio, setFontRatio] = useState(0);
 
   const handleSelectCard = (dep: number) => {
     setDepth(dep);
   };
+  useEffect(() => {
+    setFontRatio(Math.floor(widthPx / 4));
+  }, [widthPx]);
   return (
     <CardBoard
       ref={cardBoardRef}
@@ -82,14 +87,32 @@ const BarChart = ({
           handleContext={handleContext}
         />
       )}
+
       <CardTitle>
-        <span>최근 5개월 간 월별 활성 유저 수</span>
+        <span>활성 유저 수</span>
       </CardTitle>
-      <Chart height="90%" width="100%" id="chart" dataSource={dataSource}>
-        <Series valueField="oranges" argumentField="day" name="My oranges" type="bar" color="#ffaa66" />
-      </Chart>
+      <div
+        style={{
+          height: '100%',
+          width: '100%',
+          justifyContent: 'space-around',
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
+        <PortraitIcon
+          style={{
+            fontSize: Math.floor(fontRatio / 2),
+            marginTop: '20px',
+            color: 'rgb(21, 101, 192)',
+          }}
+        />
+        <span style={{ fontSize: fontRatio, marginRight: '15px' }}>
+          <strong>54</strong>
+        </span>
+      </div>
     </CardBoard>
   );
 };
 
-export default BarChart;
+export default ActiveUser;

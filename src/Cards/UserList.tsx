@@ -1,9 +1,6 @@
 import { useRef, useState } from 'react';
-import { Chart, Series } from 'devextreme-react/chart';
-
 import styled from 'styled-components';
 import ActionTools from './ActionTools';
-import { dataSource } from './data.js';
 
 const CardBoard = styled.div`
   border: 1px solid #e1dfdd;
@@ -13,6 +10,7 @@ const CardBoard = styled.div`
   background-color: white;
   position: absolute;
   border-radius: 2px;
+
   transition: height 125ms linear 125ms, width 125ms linear 0s, top 175ms ease-out, left 175ms ease-out,
     right 175ms ease-out;
   z-index: 991;
@@ -41,7 +39,7 @@ interface CardPosition {
   handleContext: ((name: string, ratioWidth: number, ratioHeight: number) => void) | null;
 }
 
-const BarChart = ({
+const UserList = ({
   topPx,
   name,
   leftPx,
@@ -58,6 +56,7 @@ const BarChart = ({
   const handleSelectCard = (dep: number) => {
     setDepth(dep);
   };
+
   return (
     <CardBoard
       ref={cardBoardRef}
@@ -82,14 +81,15 @@ const BarChart = ({
           handleContext={handleContext}
         />
       )}
+
       <CardTitle>
-        <span>최근 5개월 간 월별 활성 유저 수</span>
+        <span>유저 리스트</span>
       </CardTitle>
-      <Chart height="90%" width="100%" id="chart" dataSource={dataSource}>
-        <Series valueField="oranges" argumentField="day" name="My oranges" type="bar" color="#ffaa66" />
-      </Chart>
+      <div style={{ height: '100%', width: '100%' }}>
+        <h1>Monthly Active User</h1>
+      </div>
     </CardBoard>
   );
 };
 
-export default BarChart;
+export default UserList;

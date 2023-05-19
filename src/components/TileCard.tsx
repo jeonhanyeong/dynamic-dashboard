@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 import CardMedia from '@mui/material/CardMedia';
 import testImage from '../assets/images/test.png';
@@ -44,8 +45,9 @@ const CardDescription = styled.span`
 `;
 interface TileCardProps {
   type: string;
+  tileDescription: string;
 }
-const TileCard = ({ type }: TileCardProps) => {
+const TileCard = ({ type, tileDescription }: TileCardProps) => {
   const classes = `${type} Tile`;
 
   const handleDragStart = () => {
@@ -66,7 +68,7 @@ const TileCard = ({ type }: TileCardProps) => {
           <strong>{type}</strong>
         </CardTitle>
         <CardDescription>
-          {type} 입니다. <br /> 다이나믹 대시보드 프로젝트
+          {tileDescription} 입니다. <br />
         </CardDescription>
       </CardContent>
     </Card>

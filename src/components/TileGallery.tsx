@@ -5,10 +5,14 @@ import Button from '@mui/material/Button';
 import SearchBox from './SearchBox';
 import TileCard from './TileCard';
 
+interface TileInfo {
+  title: string;
+  description: string;
+}
 interface MyComponentProps {
   handleGalleryVisible: () => void;
-  tileTypes: Array<string>;
-  handleAddComponentByClick: (sel: string) => void;
+  tileTypes: TileInfo[];
+  handleAddComponentByClick: (sel: TileInfo) => void;
 }
 
 interface TileProps {
@@ -77,6 +81,7 @@ const Close = styled(CloseIcon)(({ theme }) => ({
 
 const TileGallery = ({ handleGalleryVisible, tileTypes, handleAddComponentByClick }: MyComponentProps) => {
   const [selected, setSelected] = useState<number>(-1);
+  const [tileDescription, setTileDescription] = useState<string[]>(['활성 유저 수']);
   // 창 닫는 이벤트
   const handleGalleryClose = () => {
     handleGalleryVisible();
@@ -106,13 +111,13 @@ const TileGallery = ({ handleGalleryVisible, tileTypes, handleAddComponentByClic
       <TileGalleryBody>
         {tileTypes.map((tileType, index) => (
           <Tile
-            key={tileType}
-            className={tileType}
+            key={tileType.title}
+            className={tileType.title}
             selected={selected === index}
             onClick={handleTileClick}
             data-index={index}
           >
-            <TileCard key={tileType} type={tileType} />
+            <TileCard key={tileType.title} type={tileType.title} tileDescription={tileType.description} />
           </Tile>
         ))}
       </TileGalleryBody>

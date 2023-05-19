@@ -9,6 +9,10 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import LineChart from '../Cards/LineChart';
 import BarChart from '../Cards/BarChart';
+import MonthlyActiveUser from '../Cards/MonthlyActiveUser';
+import ActiveUsers from '../Cards/ActiveUsers';
+import UserList from '../Cards/UserList';
+import ServerTime from '../Cards/ServerTime';
 
 interface ComponentPosition {
   id: string;
@@ -270,7 +274,72 @@ const DashboardBody = ({ handleOpenEditDashboard }: MyComponentProps) => {
         <TileGrid ref={tileGridRef}>
           {parsedData && parsedData.length > 0
             ? parsedData[0].components.map((com: ComponentPosition) => {
-                if (com.id.includes('LineChart')) {
+                if (com.id.includes('Active Users')) {
+                  return (
+                    <ActiveUsers
+                      key={com.id}
+                      name={com.id}
+                      topPx={com.top}
+                      leftPx={com.left}
+                      widthPx={com.width}
+                      heightPx={com.height}
+                      displayState={com.display}
+                      isPreview={isSaving}
+                      handleDelete={null}
+                      handleContext={null}
+                    />
+                  );
+                }
+                if (com.id.includes('User List')) {
+                  return (
+                    <UserList
+                      key={com.id}
+                      name={com.id}
+                      topPx={com.top}
+                      leftPx={com.left}
+                      widthPx={com.width}
+                      heightPx={com.height}
+                      displayState={com.display}
+                      isPreview={isSaving}
+                      handleDelete={null}
+                      handleContext={null}
+                    />
+                  );
+                }
+                if (com.id.includes('Server Time')) {
+                  return (
+                    <ServerTime
+                      key={com.id}
+                      name={com.id}
+                      topPx={com.top}
+                      leftPx={com.left}
+                      widthPx={com.width}
+                      heightPx={com.height}
+                      displayState={com.display}
+                      isPreview={isSaving}
+                      handleDelete={null}
+                      handleContext={null}
+                    />
+                  );
+                }
+                if (com.id.includes('Monthly Active User')) {
+                  return (
+                    <MonthlyActiveUser
+                      key={com.id}
+                      name={com.id}
+                      topPx={com.top}
+                      leftPx={com.left}
+                      widthPx={com.width}
+                      heightPx={com.height}
+                      displayState={com.display}
+                      isPreview={isSaving}
+                      handleDelete={null}
+                      handleContext={null}
+                    />
+                  );
+                }
+
+                if (com.id.includes('Number of connections by application in the last 20 days')) {
                   return (
                     <LineChart
                       key={com.id}
@@ -286,7 +355,7 @@ const DashboardBody = ({ handleOpenEditDashboard }: MyComponentProps) => {
                     />
                   );
                 }
-                if (com.id.includes('BarChart')) {
+                if (com.id.includes('MAU by month in the last 5 months')) {
                   return (
                     <BarChart
                       key={com.id}

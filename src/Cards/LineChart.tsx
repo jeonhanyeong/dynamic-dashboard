@@ -101,7 +101,7 @@ const LineChart = ({
       )}
 
       <CardTitle>
-        <span>라인 차트</span>
+        <span>최근 20일 간 일자별 애플리케이션별 접속 수</span>
       </CardTitle>
       <div style={{ height: '100%', width: '100%' }}>
         <Chart height="100%" width="100%" dataSource={countriesInfo}>
