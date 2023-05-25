@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Chart, Series } from 'devextreme-react/chart';
+import { Chart, Series, Export, Legend } from 'devextreme-react/chart';
 
 import styled from 'styled-components';
 import ActionTools from './ActionTools';
@@ -86,7 +86,10 @@ const BarChart = ({
         <span>최근 5개월 간 월별 활성 유저 수</span>
       </CardTitle>
       <Chart height="90%" width="100%" id="chart" dataSource={dataSource}>
-        <Series valueField="oranges" argumentField="day" name="My oranges" type="bar" color="#ffaa66" />
+        <Series valueField="oranges" argumentField="day" name="MAU" type="bar" color="#ffaa66" />
+
+        <Export enabled />
+        <Legend verticalAlignment="bottom" horizontalAlignment="center" />
       </Chart>
     </CardBoard>
   );

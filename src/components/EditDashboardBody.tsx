@@ -9,6 +9,7 @@ import MonthlyActiveUser from '../Cards/MonthlyActiveUser';
 import ActiveUsers from '../Cards/ActiveUsers';
 import UserList from '../Cards/UserList';
 import ServerTime from '../Cards/ServerTime';
+import { AutoMoving, ResizeAutoMoving } from '../functions/AutoMoving';
 
 interface ComponentPosition {
   id: string;
@@ -113,8 +114,8 @@ const TestDiv = styled.div`
   position: absolute;
   background-color: white;
   box-sizing: border-box;
-  min-height: 89px;
-  min-width: 89px;
+  min-height: 85px;
+  min-width: 85px;
 `;
 
 const ResizeHandle = styled.div`
@@ -138,7 +139,7 @@ interface resizePosition {
   display: string;
 }
 
-interface placeholderPositionInterface {
+interface PositionInterface {
   positionTop: number;
   positionLeft: number;
   positionWidth: number;
@@ -168,13 +169,13 @@ const EditDashboardBody = ({
   const resizeCardRef = useRef<HTMLDivElement>(null);
   const previewDashboardTitleRef = useRef<HTMLDivElement>(null);
 
-  const [autoMovingClickedElement, setAutoMovingClickedElement] = useState<HTMLDivElement | null>();
+  const [autoMovingClickedElement, setAutoMovingClickedElement] = useState<HTMLDivElement | null | undefined>();
 
   const [isEditingMode, setIsEditingMode] = useState(false);
   const [clickPreview, setClickPreview] = useState(true);
   const [dashboardTitle, setDashboardTitle] = useState('제목 없음');
   const [componentPositions, setComponentPositions] = useState<ComponentPosition[]>([]);
-  const [placeholderPosition, setPlaceholderPosition] = useState<placeholderPositionInterface>({
+  const [placeholderPosition, setPlaceholderPosition] = useState<PositionInterface>({
     positionTop: 0,
     positionLeft: 0,
     positionWidth: 445,
@@ -195,6 +196,9 @@ const EditDashboardBody = ({
     left: 0,
     display: 'none',
   });
+
+  const [initialPosition, setInitialPosition] = useState<PositionInterface>();
+  const [initialComponentPosition, setInitialComponentPosition] = useState<ComponentPosition[]>([]);
 
   const galleryOpen = () => {
     handleGalleryVisible();
@@ -244,96 +248,9 @@ const EditDashboardBody = ({
   // 맥시멈(일단 처음에 보여지는 화면 크기(타일갤러리 제외)) = left: 900, top: 360
   // 수정1) 현재는 placeholder의 위치에 대해서만 컴포넌트의 위치가 변경이 됌
   // 수정2_Todo) placeholder의 위치와 다른 컴포넌트의 위치도 감지해서 안겹치게 이동해야됌(최종)
-  const autoArrangeElements = (elements: ComponentPosition[], placeholder: placeholderPositionInterface) => {
-    const placeholderLeft = placeholder.positionLeft;
-    const placeholderTop = placeholder.positionTop;
-    const placeholderWidth = placeholder.positionWidth;
-    const placeholderHeight = placeholder.positionHeight;
-
-    const overlapResults = elements.map((element, index) => {
-      const updatedElement = { ...element }; // 객체의 복사본 생성
-      if (autoMovingClickedElement?.className.includes(element.id)) {
-        return updatedElement;
-      }
-
-      const horizontalOverlap =
-        Math.max(element.left, placeholderLeft) <
-        Math.min(element.left + element.width, placeholderLeft + placeholderWidth);
-      const verticalOverlap =
-        Math.max(element.top, placeholderTop) <
-        Math.min(element.top + element.height, placeholderTop + placeholderHeight);
-
-      if (horizontalOverlap && verticalOverlap) {
-        const overlapTop = Math.max(element.top, placeholderTop);
-        const overlapLeft = Math.max(element.left, placeholderLeft);
-        const overlapBottom = Math.min(element.top + element.height, placeholderTop + placeholderHeight);
-        const overlapRight = Math.min(element.left + element.width, placeholderLeft + placeholderWidth);
-
-        const overlapHeight = Math.ceil((overlapBottom - overlapTop) / 10) * 10;
-        const overlapWidth = Math.round((overlapRight - overlapLeft) / 10) * 10;
-
-        console.log('height', overlapHeight);
-        console.log('width', overlapWidth);
-
-        const targetCenterX = element.left + element.width / 2;
-        const targetCenterY = element.top + element.height / 2;
-        const placeholderCenterX = placeholderLeft + placeholderWidth / 2;
-        const placeholderCenterY = placeholderTop + placeholderHeight / 2;
-
-        const horizontalDistance = targetCenterX - placeholderCenterX;
-        const verticalDistance = targetCenterY - placeholderCenterY;
-
-        if (Math.abs(horizontalDistance) > Math.abs(verticalDistance)) {
-          if (horizontalDistance > 0) {
-            // console.log('겹친 방향: 오른쪽', element);
-            if (updatedElement.left + overlapWidth > 900) {
-              if (element.left - element.width - placeholderWidth + overlapWidth < 0) {
-                // console.log('엥');
-                updatedElement.left += overlapWidth;
-                return updatedElement;
-              }
-              updatedElement.left = element.left - element.width - placeholderWidth + overlapWidth - 10;
-              return updatedElement;
-            }
-            updatedElement.left += overlapWidth;
-            return updatedElement;
-          }
-
-          if (updatedElement.left - overlapWidth < 0) {
-            // console.log('겹친 방향: 왼쪽', element);
-            updatedElement.left = element.left + element.width + placeholderWidth - overlapWidth + 10;
-            return updatedElement;
-          }
-          updatedElement.left -= overlapWidth;
-          return updatedElement;
-        }
-
-        if (verticalDistance > 0) {
-          if (updatedElement.top + overlapHeight > 700) {
-            // console.log('겹친 방향: 아래');
-            if (updatedElement.top - updatedElement.height - placeholderHeight + overlapHeight < 0) {
-              updatedElement.top += overlapHeight;
-              return updatedElement;
-            }
-            updatedElement.top = updatedElement.top - updatedElement.height - placeholderHeight + overlapHeight - 6;
-            // console.log(updatedElement.top - updatedElement.height - placeholderHeight + overlapHeight);
-            return updatedElement;
-          }
-          updatedElement.top += overlapHeight;
-          return updatedElement;
-        }
-
-        if (updatedElement.top - overlapHeight < 0) {
-          // console.log('겹친 방향: 위');
-          updatedElement.top = updatedElement.top + updatedElement.height + placeholderHeight - overlapHeight + 6;
-          return updatedElement;
-        }
-        updatedElement.top -= overlapHeight;
-        return updatedElement;
-      }
-      return updatedElement;
-    });
-    setComponentPositions(overlapResults);
+  const autoArrangeElements = (elements: ComponentPosition[], placeholder: PositionInterface) => {
+    setComponentPositions(AutoMoving(elements, placeholder, autoMovingClickedElement));
+    ResizeAutoMoving();
   };
 
   // 타일을 대시보드로 끌어올 때
@@ -351,20 +268,20 @@ const EditDashboardBody = ({
       dragTarget?.className.includes('MAU by month in the last 5 months') ||
       dragTarget?.className.includes('Number of connections by application in the last 20 days')
     ) {
-      heightOfType = 356; // 4칸
-      WidthOfType = 534; // 4칸
+      heightOfType = 355;
+      WidthOfType = 535;
     } else if (
       dragTarget?.className.includes('Active Users') ||
       dragTarget?.className.includes('Monthly Active User')
     ) {
-      heightOfType = 178; // 2칸
-      WidthOfType = 178;
+      heightOfType = 175;
+      WidthOfType = 265;
     } else if (dragTarget?.className.includes('Server Time')) {
-      heightOfType = 178; // 3칸
-      WidthOfType = 267; // 5칸
+      heightOfType = 175;
+      WidthOfType = 265;
     } else {
-      heightOfType = 267; // 3칸
-      WidthOfType = 445; // 5칸
+      heightOfType = 265;
+      WidthOfType = 445;
     }
     // 회색배경(placeholder)포지션
     setPlaceholderPosition((prevDragPosition) => ({
@@ -409,6 +326,7 @@ const EditDashboardBody = ({
     const target = event.target as HTMLElement;
 
     const cardInDashboard = target.parentElement as HTMLDivElement;
+
     setAutoMovingClickedElement(cardInDashboard);
     const initialTop = parseInt(cardInDashboard.style.top, 10);
     const initialLeft = parseInt(cardInDashboard.style.left, 10);
@@ -417,6 +335,19 @@ const EditDashboardBody = ({
 
     if (target.classList.contains('Card-Cover')) {
       setDragging(true);
+
+      const to = initialTop;
+      const le = initialLeft;
+      const ar = componentPositions;
+
+      setPlaceholderPosition((prevDragPosition) => ({
+        ...prevDragPosition,
+        positionTop: initialTop,
+        positionLeft: initialLeft,
+        positionWidth: initialWidth,
+        positionHeight: initialHeight,
+      }));
+
       // 드래그오버
       const handleCardDragOver = (moveEvent: DragEvent) => {
         moveEvent.preventDefault();
@@ -433,6 +364,10 @@ const EditDashboardBody = ({
           positionWidth: initialWidth,
           positionHeight: initialHeight,
         }));
+
+        if (finalTop === to && finalLeft === le) {
+          setComponentPositions(ar);
+        }
       };
 
       // 드래그리브
@@ -441,12 +376,11 @@ const EditDashboardBody = ({
       };
       // 드랍
       const handleCardDrop = (upEvent: DragEvent) => {
-        const upComponent = target.parentElement as HTMLDivElement;
         setDragging(false);
         cardInDashboard.style.opacity = '1';
         setComponentPositions((prevComponentPositions) => {
           const update = prevComponentPositions.map((com) => {
-            if (upComponent.className.includes(com.id)) {
+            if (cardInDashboard.className.includes(com.id)) {
               return {
                 ...com,
                 top: com.top + draggingTop > 0 ? com.top + draggingTop : 0,
@@ -463,15 +397,27 @@ const EditDashboardBody = ({
         document.removeEventListener('dragleave', handleCardDragLeave);
         document.removeEventListener('drop', handleCardDrop);
       };
+
+      const mup = () => {
+        setDragging(false);
+        setAutoMovingClickedElement(null);
+        document.removeEventListener('dragover', handleCardDragOver);
+        document.removeEventListener('dragleave', handleCardDragLeave);
+        document.removeEventListener('drop', handleCardDrop);
+        document.removeEventListener('mouseup', mup);
+      };
+
       document.addEventListener('dragover', handleCardDragOver);
       document.addEventListener('dragleave', handleCardDragLeave);
       document.addEventListener('drop', handleCardDrop);
+      document.addEventListener('mouseup', mup);
     }
 
     // 리사이즈 핸들일때
     else if (target.classList.contains('resizeHandle')) {
       setDragging(true);
-
+      console.log(initialWidth);
+      console.log(initialHeight);
       const downEventClientX = event.clientX;
       const downEventClientY = event.clientY;
 
@@ -517,27 +463,28 @@ const EditDashboardBody = ({
 
         setPlaceholderPosition((prevDragPosition) => ({
           ...prevDragPosition,
-          positionWidth: Math.ceil(finalResizeWidth / 90) * 90 - 4,
-          positionHeight: Math.ceil(finalResizeHeight / 90) * 90 - 4,
+          positionWidth: Math.ceil(finalResizeWidth / 90) * 90 - 5,
+          positionHeight: Math.ceil(finalResizeHeight / 90) * 90 - 5,
         }));
       };
 
       const resizeMouseUp = () => {
         setDragging(false);
-        setComponentPositions(
-          componentPositions.map((com) => {
+        setComponentPositions((prevComponentPositions) => {
+          const update = prevComponentPositions.map((com) => {
             if (cardInDashboard.className.includes(com.id)) {
               return {
                 ...com,
-                width: Math.ceil(finalResizeWidth / 90) * 90 - 4,
-                height: Math.ceil(finalResizeHeight / 90) * 90 - 4,
+                width: Math.ceil(finalResizeWidth / 90) * 90 - 5,
+                height: Math.ceil(finalResizeHeight / 90) * 90 - 5,
                 display: 'block',
               };
             }
             return com;
-          }),
-        );
+          });
 
+          return update;
+        });
         setResizingComponents((prevSize) => ({
           ...prevSize,
           display: 'none',
@@ -712,7 +659,7 @@ const EditDashboardBody = ({
     if (componentPositions.length > 0) {
       autoArrangeElements(componentPositions, placeholderPosition);
     }
-  }, [placeholderPosition.positionTop, placeholderPosition.positionLeft]);
+  }, [placeholderPosition]);
 
   // 타일 갤러리에서 클릭 후 추가 버튼으로 컴포넌트 추가하기
   useEffect(() => {
@@ -721,20 +668,20 @@ const EditDashboardBody = ({
         selectedTileType.clickedTile === 'MAU by month in the last 5 months' ||
         selectedTileType.clickedTile === 'Number of connections by application in the last 20 days'
       ) {
-        heightOfType = 356; // 4칸
-        WidthOfType = 534; // 4칸
+        heightOfType = 355;
+        WidthOfType = 535;
       } else if (
         selectedTileType.clickedTile === 'Active Users' ||
         selectedTileType.clickedTile === 'Monthly Active User'
       ) {
-        heightOfType = 178; // 2칸
-        WidthOfType = 178;
+        heightOfType = 175;
+        WidthOfType = 265;
       } else if (selectedTileType.clickedTile === 'Server Time') {
-        heightOfType = 178; // 3칸
-        WidthOfType = 267; // 5칸
+        heightOfType = 175;
+        WidthOfType = 265;
       } else {
-        heightOfType = 267; // 3칸
-        WidthOfType = 445; // 5칸
+        heightOfType = 265;
+        WidthOfType = 445;
       }
       setComponentPositions((prevComponentPositions) => [
         ...prevComponentPositions,
@@ -866,6 +813,8 @@ const EditDashboardBody = ({
                 backgroundColor: 'rgba(0,0,0,0.125)',
                 boxSizing: 'border-box',
                 position: 'absolute',
+                border: '1px solid #e1dfdd',
+                boxShadow: '0 1.6px 3.6px 0 rgba(0, 0, 0, 0.132), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.108)',
                 top: placeholderPosition.positionTop,
                 left: placeholderPosition.positionLeft,
               }}

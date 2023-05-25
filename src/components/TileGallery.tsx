@@ -81,7 +81,7 @@ const Close = styled(CloseIcon)(({ theme }) => ({
 
 const TileGallery = ({ handleGalleryVisible, tileTypes, handleAddComponentByClick }: MyComponentProps) => {
   const [selected, setSelected] = useState<number>(-1);
-  const [tileDescription, setTileDescription] = useState<string[]>(['활성 유저 수']);
+
   // 창 닫는 이벤트
   const handleGalleryClose = () => {
     handleGalleryVisible();

@@ -127,9 +127,6 @@ const ServerTime = ({
         />
       )}
 
-      <CardTitle>
-        <span>서버 시간</span>
-      </CardTitle>
       <div
         style={{
           height: '100%',
@@ -140,6 +137,7 @@ const ServerTime = ({
           flexDirection: 'column',
         }}
       >
+        <span style={{ fontSize: fontRatio / 3.5 }}> 대한민국 표준시 </span>
         <span style={{ fontSize: fontRatio, marginBottom: '10px' }}>
           <strong>{`${timer.hours}:${timer.minutes}:${timer.seconds}`}</strong>
         </span>

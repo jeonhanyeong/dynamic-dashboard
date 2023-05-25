@@ -1,5 +1,7 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import GroupIcon from '@mui/icons-material/Group';
+import PersonIcon from '@mui/icons-material/Person';
 import ActionTools from './ActionTools';
 
 const CardBoard = styled.div`
@@ -25,6 +27,8 @@ const CardTitle = styled.div`
   font-size: 14px;
   font-weight: bold;
   padding-left: 5px;
+  display: flex;
+  align-items: center;
 `;
 
 interface CardPosition {
@@ -39,7 +43,7 @@ interface CardPosition {
   handleContext: ((name: string, ratioWidth: number, ratioHeight: number) => void) | null;
 }
 
-const MonthlyActiveUser = ({
+const ActiveUser = ({
   topPx,
   name,
   leftPx,
@@ -52,11 +56,14 @@ const MonthlyActiveUser = ({
 }: CardPosition) => {
   const cardBoardRef = useRef<HTMLDivElement>(null);
   const [depth, setDepth] = useState(991);
+  const [fontRatio, setFontRatio] = useState(0);
 
   const handleSelectCard = (dep: number) => {
     setDepth(dep);
   };
-
+  useEffect(() => {
+    setFontRatio(Math.floor(widthPx / 4));
+  }, [widthPx]);
   return (
     <CardBoard
       ref={cardBoardRef}
@@ -81,15 +88,36 @@ const MonthlyActiveUser = ({
           handleContext={handleContext}
         />
       )}
-
-      <CardTitle>
-        <span>MAU (월별 활성 유저 수)</span>
-      </CardTitle>
-      <div style={{ height: '100%', width: '100%' }}>
-        <h3>Monthly Active User</h3>
+      <div
+        style={{
+          height: '100%',
+          width: '100%',
+          justifyContent: 'space-around',
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
+        <GroupIcon
+          style={{
+            fontSize: Math.floor(fontRatio),
+            color: 'rgb(21, 101, 192)',
+          }}
+        />
+        <div style={{ display: 'flex', flexDirection: 'column', width: widthPx / 2.2 }}>
+          <span style={{ fontSize: Math.floor(fontRatio / 5) }}>
+            <strong>월별 활성 유저</strong>
+          </span>
+          <span style={{ color: 'gray', fontSize: Math.floor(fontRatio / 5.5) }}>Monthly Active User</span>
+          <span style={{ fontSize: Math.floor(fontRatio / 1.5), marginBottom: '10px' }}>
+            <strong>12</strong>
+          </span>
+        </div>
+      </div>
+      <div style={{ position: 'absolute', bottom: '10px' }}>
+        <span style={{ color: 'gray', fontSize: Math.floor(fontRatio / 8) }}>최근 30일 (2023-04-24 ~)</span>
       </div>
     </CardBoard>
   );
 };
 
-export default MonthlyActiveUser;
+export default ActiveUser;

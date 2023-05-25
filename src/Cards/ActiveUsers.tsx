@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+
+import PersonIcon from '@mui/icons-material/Person';
 import PortraitIcon from '@mui/icons-material/Portrait';
 import ActionTools from './ActionTools';
 
@@ -88,9 +90,6 @@ const ActiveUser = ({
         />
       )}
 
-      <CardTitle>
-        <span>활성 유저 수</span>
-      </CardTitle>
       <div
         style={{
           height: '100%',
@@ -100,16 +99,21 @@ const ActiveUser = ({
           alignItems: 'center',
         }}
       >
-        <PortraitIcon
+        <PersonIcon
           style={{
-            fontSize: Math.floor(fontRatio / 2),
-            marginTop: '20px',
+            fontSize: Math.floor(fontRatio),
             color: 'rgb(21, 101, 192)',
           }}
         />
-        <span style={{ fontSize: fontRatio, marginRight: '15px' }}>
-          <strong>54</strong>
-        </span>
+        <div style={{ display: 'flex', flexDirection: 'column', width: widthPx / 2.2 }}>
+          <span style={{ fontSize: Math.floor(fontRatio / 5) }}>
+            <strong>활성 유저</strong>
+          </span>
+          <span style={{ color: 'gray', fontSize: Math.floor(fontRatio / 5.5) }}>Active Users</span>
+          <span style={{ fontSize: Math.floor(fontRatio / 1.5), marginBottom: '10px' }}>
+            <strong>54</strong>
+          </span>
+        </div>
       </div>
     </CardBoard>
   );

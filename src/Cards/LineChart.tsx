@@ -115,9 +115,6 @@ const LineChart = ({
           </ArgumentAxis>
           <Legend verticalAlignment="bottom" horizontalAlignment="center" itemTextPosition="bottom" />
           <Export enabled />
-          <Title text="Energy Consumption in 2004">
-            <Subtitle text="(Millions of Tons, Oil Equivalent)" />
-          </Title>
           <Tooltip enabled />
         </Chart>
       </div>

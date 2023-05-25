@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import DataGrid, { Scrolling, Sorting, LoadPanel } from 'devextreme-react/data-grid';
 import styled from 'styled-components';
 import ActionTools from './ActionTools';
 
@@ -53,6 +54,33 @@ const UserList = ({
   const cardBoardRef = useRef<HTMLDivElement>(null);
   const [depth, setDepth] = useState(991);
 
+  const items = [
+    {
+      id: '744f5b22-819f-476c-a4d9-648f3d2f2b72',
+      firstName: '운영자',
+      lastName: null,
+      email: null,
+    },
+    {
+      id: '2392d0dc-2d1a-4b12-911e-6c6c32660cea',
+      firstName: 'cheongho',
+      lastName: 'bae',
+      email: 'cheongho.bae@cloudmt.co.kr',
+    },
+    {
+      id: '6c762bc1-e410-40d8-90e5-eaf91bcad628',
+      firstName: 'colson-user',
+      lastName: 'cm-app',
+      email: 'sdev@cloudmt.co.kr',
+    },
+    {
+      id: '0b41e44a-c4d8-405b-8a2c-8fa9544ecced',
+      firstName: 'cm-rssmonitor',
+      lastName: 'cm-rssmonitor',
+      email: 'le@cloudmt.co.kr',
+    },
+  ];
+
   const handleSelectCard = (dep: number) => {
     setDepth(dep);
   };
@@ -85,8 +113,12 @@ const UserList = ({
       <CardTitle>
         <span>유저 리스트</span>
       </CardTitle>
-      <div style={{ height: '100%', width: '100%' }}>
-        <h1>Monthly Active User</h1>
+      <div style={{ height: '100%', width: '100%', padding: '10px 0px' }}>
+        <DataGrid height={heightPx - 50} dataSource={items} keyExpr="id" showBorders>
+          <Sorting mode="none" />
+          <Scrolling mode="infinite" />
+          <LoadPanel enabled={false} />
+        </DataGrid>
       </div>
     </CardBoard>
   );

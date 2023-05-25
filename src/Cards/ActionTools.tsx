@@ -3,6 +3,7 @@ import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import { useEffect, useRef, useState } from 'react';
 import IconButton from '@mui/material/IconButton';
 import styled from 'styled-components';
+import SettingsIcon from '@mui/icons-material/Settings';
 import ContextMenu from './ContextMenu';
 
 const Cover = styled.div`
@@ -179,6 +180,11 @@ const ActionTools = ({ name, handleDelete, handleSelectCard, handleContext }: My
             handleResizeRatioClick={handleResizeRatioClick}
             currentRatio={currentRatio}
           />
+        )}
+        {name.includes('Server Time') && (
+          <IconButton className={name} style={{ padding: 0, color: '#1976d2' }}>
+            <SettingsIcon fontSize="small" />
+          </IconButton>
         )}
         <IconButton className={name} style={{ padding: 0, color: '#a52121' }} onClick={handleDeleteClick}>
           <DeleteForeverIcon fontSize="small" />
