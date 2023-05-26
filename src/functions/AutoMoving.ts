@@ -56,6 +56,32 @@ export const AutoMoving = (
   const placeholderWidth = placeholder.positionWidth;
   const placeholderHeight = placeholder.positionHeight;
 
+  const test = (update: ComponentPosition) => {
+    const updateCopy = { ...update };
+    const over = elements.some((element) => {
+      const horizontalOverlap =
+        Math.max(update.left, element.left) < Math.min(update.left + update.width, element.left + element.width);
+      const verticalOverlap =
+        Math.max(update.top, element.top) < Math.min(update.top + update.height, element.top + element.height);
+
+      return horizontalOverlap && verticalOverlap;
+    });
+
+    if (over) {
+      const objectWithMaxTopHeight = elements.reduce((maxObject, currentObject) => {
+        const maxTopHeight = (maxObject.top || 0) + (maxObject.height || 0);
+        const currentTopHeight = (currentObject.top || 0) + (currentObject.height || 0);
+        return currentTopHeight > maxTopHeight ? currentObject : maxObject;
+      }, {} as ComponentPosition);
+      console.log(objectWithMaxTopHeight);
+      updateCopy.top = Math.ceil((objectWithMaxTopHeight.top + objectWithMaxTopHeight.height) / 90) * 90;
+      updateCopy.left = 0;
+      return updateCopy;
+    }
+
+    return updateCopy;
+  };
+
   const overlapResults = elements.map((element, index) => {
     const updatedElement = { ...element }; // 객체의 복사본 생성
     if (autoMovingClickedElement?.className.includes(element.id)) {
@@ -94,6 +120,7 @@ export const AutoMoving = (
             return updatedElement;
           }
           updatedElement.left += overlapWidth;
+
           return updatedElement;
         }
 

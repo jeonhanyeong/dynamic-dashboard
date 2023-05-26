@@ -197,9 +197,6 @@ const EditDashboardBody = ({
     display: 'none',
   });
 
-  const [initialPosition, setInitialPosition] = useState<PositionInterface>();
-  const [initialComponentPosition, setInitialComponentPosition] = useState<ComponentPosition[]>([]);
-
   const galleryOpen = () => {
     handleGalleryVisible();
   };

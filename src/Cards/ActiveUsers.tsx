@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-
+import axios from 'axios';
 import PersonIcon from '@mui/icons-material/Person';
 import PortraitIcon from '@mui/icons-material/Portrait';
 import ActionTools from './ActionTools';
@@ -65,6 +65,7 @@ const ActiveUser = ({
   useEffect(() => {
     setFontRatio(Math.floor(widthPx / 4));
   }, [widthPx]);
+
   return (
     <CardBoard
       ref={cardBoardRef}
