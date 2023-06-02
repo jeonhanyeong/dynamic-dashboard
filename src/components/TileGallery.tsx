@@ -10,6 +10,7 @@ interface TileInfo {
   description: string;
 }
 interface MyComponentProps {
+  isDarkMode: boolean;
   handleGalleryVisible: () => void;
   tileTypes: TileInfo[];
   handleAddComponentByClick: (sel: TileInfo) => void;
@@ -25,22 +26,25 @@ const Tile = styled.li<TileProps>`
   margin: 0;
   padding: 10px 20px;
   cursor: pointer;
-  background-color: ${(props) => (props.selected ? 'rgba(0, 0, 0, 0.12)' : 'white')};
+  background-color: ${(props) => (props.selected ? props.theme.hoverColor : props.theme.bgColor || 'white')};
+  color: ${(props) => props.theme.textColor};
   &:hover {
-    background-color: ${(props) => (!props.selected ? 'rgba(0, 0, 0, 0.05)' : 'rgba(0, 0, 0, 0.12)')};
+    background-color: ${(props) =>
+      !props.selected ? props.theme.hoverColor : props.theme.borderColor || props.theme.hoverColor};
   }
 `;
 
 const TileGalleryContents = styled.div`
   /* 스타일 작성 */
-  background-color: #fff;
-  color: #000;
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
   padding: 10px;
   width: 20%;
   height: 100%;
   position: absolute;
   right: 0;
-  border-left: 1px solid lightgray;
+  border-left: 1px solid;
+  border-color: ${(props) => props.theme.borderColor};
   padding: 0;
   z-index: 998;
 `;
@@ -49,7 +53,8 @@ const TileGalleryHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
   padding: 0 10px;
 `;
 
@@ -58,28 +63,29 @@ const TileGalleryBody = styled.ul`
   padding: 0;
   width: 90%;
   height: 70%;
-
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
   overflow-y: auto;
 `;
 
-const buttonStyle = {
-  margin: '20px',
-};
-
 const Close = styled(CloseIcon)(({ theme }) => ({
   cursor: 'pointer',
-  backgroundColor: '#fff',
-  color: '#000',
+  backgroundColor: theme.bgColor,
+  color: theme.textColor,
   '&:hover': {
     backgroundColor: '#a52121',
-    color: '#fff',
-    transition: 'background-color 0.3s ease-in-out',
+    color: '#EDECEB',
+    transition: 'background-color 0.1s ease-in-out',
     cursor: 'pointer',
   },
   padding: '5px',
 }));
 
-const TileGallery = ({ handleGalleryVisible, tileTypes, handleAddComponentByClick }: MyComponentProps) => {
+const buttonStyle = {
+  margin: '20px',
+};
+
+const TileGallery = ({ isDarkMode, handleGalleryVisible, tileTypes, handleAddComponentByClick }: MyComponentProps) => {
   const [selected, setSelected] = useState<number>(-1);
 
   // 창 닫는 이벤트
@@ -107,7 +113,7 @@ const TileGallery = ({ handleGalleryVisible, tileTypes, handleAddComponentByClic
         <Close onClick={handleGalleryClose} />
       </TileGalleryHeader>
       <p style={{ fontSize: '12px', padding: '0 15px' }}>타일을 끌어서 놓거나 선택한 후 추가를 클릭하세요.</p>
-      <SearchBox />
+      <SearchBox isDarkMode={isDarkMode} />
       <TileGalleryBody>
         {tileTypes.map((tileType, index) => (
           <Tile

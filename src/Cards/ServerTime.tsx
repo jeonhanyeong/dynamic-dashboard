@@ -3,11 +3,12 @@ import styled from 'styled-components';
 import ActionTools from './ActionTools';
 
 const CardBoard = styled.div`
-  border: 1px solid #e1dfdd;
+  border: 1px solid;
+  border-color: ${(props) => props.theme.borderColor};
   box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.132), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.108);
   box-sizing: border-box;
   padding: 10px;
-  background-color: white;
+  background-color: ${(props) => props.theme.bgColor};
   position: absolute;
   border-radius: 2px;
 
@@ -16,15 +17,6 @@ const CardBoard = styled.div`
   z-index: 991;
   min-height: 84px;
   min-width: 84px;
-`;
-
-const CardTitle = styled.div`
-  width: 100%;
-  height: auto;
-  background-color: none;
-  font-size: 14px;
-  font-weight: bold;
-  padding-left: 5px;
 `;
 
 interface CardPosition {
@@ -37,6 +29,7 @@ interface CardPosition {
   isPreview: boolean;
   handleDelete: ((event: React.MouseEvent) => void) | null;
   handleContext: ((name: string, ratioWidth: number, ratioHeight: number) => void) | null;
+  isDarkMode: boolean;
 }
 
 interface TimeInfo {
@@ -49,6 +42,7 @@ interface TimeInfo {
 }
 
 const ServerTime = ({
+  isDarkMode,
   topPx,
   name,
   leftPx,
@@ -137,11 +131,13 @@ const ServerTime = ({
           flexDirection: 'column',
         }}
       >
-        <span style={{ fontSize: fontRatio / 3.5 }}> 대한민국 표준시 </span>
-        <span style={{ fontSize: fontRatio, marginBottom: '10px' }}>
+        <span style={{ color: isDarkMode ? '#EDECEB' : '#000', fontSize: fontRatio / 3.5 }}> 대한민국 표준시 </span>
+        <span style={{ color: isDarkMode ? '#EDECEB' : '#000', fontSize: fontRatio, marginBottom: '10px' }}>
           <strong>{`${timer.hours}:${timer.minutes}:${timer.seconds}`}</strong>
         </span>
-        <span style={{ fontSize: fontRatio / 3.5 }}>{`${timer.year}년 ${timer.month}월 ${timer.day}일`}</span>
+        <span
+          style={{ color: isDarkMode ? 'lightgray' : 'gray', fontSize: fontRatio / 3.5 }}
+        >{`${timer.year}년 ${timer.month}월 ${timer.day}일`}</span>
       </div>
     </CardBoard>
   );

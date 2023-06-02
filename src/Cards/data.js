@@ -1,19 +1,21 @@
 const energySources = [
-  { value: 'hydro', name: 'Hydro-electric' },
-  { value: 'oil', name: 'Oil' },
-  { value: 'gas', name: 'Natural gas' },
-  { value: 'coal', name: 'Coal' },
-  { value: 'nuclear', name: 'Nuclear' },
+  { value: 'Billing', name: 'Billing' },
+  { value: 'SalesOps', name: 'SalesOps' },
+  { value: 'colson', name: 'colson' },
+  { value: 'iam', name: 'iam' },
+  { value: 'matecdn_back', name: 'matecdn_back' },
+  { value: 'matecdn_front', name: 'matecdn_front' },
 ];
 
 const countriesInfo = [
   {
-    country: 'USA',
-    hydro: 71.2,
-    oil: 910.4,
-    gas: 483.2,
-    coal: 564.3,
-    nuclear: 216.1,
+    country: '2022-05-11',
+    Billing: 71.2,
+    SalesOps: 910.4,
+    colson: 483.2,
+    iam: 564.3,
+    matecdn_back: 216.1,
+    matecdn_front: 216.1,
   },
   {
     country: 'China',

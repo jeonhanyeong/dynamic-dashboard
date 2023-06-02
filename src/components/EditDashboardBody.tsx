@@ -19,8 +19,15 @@ interface ComponentPosition {
   height: number;
   display: string;
 }
+interface apiInfoInterface {
+  gateway: string;
+  username: string;
+  password: string;
+}
 
 interface MyComponentProps extends HTMLAttributes<HTMLDivElement> {
+  isDarkMode: boolean;
+  apiInfo: apiInfoInterface;
   dragTarget: HTMLDivElement | null;
   dragTargetType: string | undefined;
   selectedTileType: {
@@ -43,6 +50,23 @@ interface LocalStorageType {
   components: ComponentPosition[];
 }
 
+const DarkModeDashboardSize = styled.div`
+  top: 0px;
+  left: 0px;
+
+  position: absolute;
+  box-sizing: border-box;
+  opacity: 0.7;
+  border-width: 1px;
+  border-right-style: dashed;
+  border-bottom-style: dashed;
+  pointer-events: none;
+  line-height: normal;
+  background-color: none;
+  font-size: 13px;
+  font-weight: inherit;
+`;
+
 const ContentTop = styled.div`
   display: flex;
   align-items: center;
@@ -53,6 +77,8 @@ const ContentTop = styled.div`
   margin-top: 20px;
   box-sizing: border-box;
   justify-content: space-between;
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
 `;
 const Explain = styled.div`
   width: 100%;
@@ -60,11 +86,9 @@ const Explain = styled.div`
   padding: 0 0 0 40px;
   box-sizing: border-box;
   display: block;
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
 `;
-
-const btnStyle = {
-  marginRight: '10px',
-};
 
 const EditDashboard = styled.div`
   z-index: 990;
@@ -77,6 +101,8 @@ const EditDashboard = styled.div`
   display: block;
   flex: 1 1 auto;
   box-sizing: border-box;
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
 `;
 
 const TileGrid = styled.div<TileGridProps>`
@@ -96,6 +122,8 @@ const TileGrid = styled.div<TileGridProps>`
   background-position-x: 0%;
   background-position-y: 0%;
   background-size: auto;
+  // background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
 `;
 
 const ResizePlaceHolder = styled.div`
@@ -105,6 +133,8 @@ const ResizePlaceHolder = styled.div`
   box-sizing: border-box;
   opacity: 0.5;
   cursor: se-resize;
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
 `;
 
 const TestDiv = styled.div`
@@ -116,6 +146,8 @@ const TestDiv = styled.div`
   box-sizing: border-box;
   min-height: 85px;
   min-width: 85px;
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
 `;
 
 const ResizeHandle = styled.div`
@@ -129,6 +161,8 @@ const ResizeHandle = styled.div`
   z-index: 999;
   border-bottom: 1px solid gray;
   border-right: 1px solid gray;
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
 `;
 
 interface resizePosition {
@@ -147,6 +181,8 @@ interface PositionInterface {
 }
 
 const EditDashboardBody = ({
+  isDarkMode,
+  apiInfo,
   dragTarget,
   dragTargetType,
   selectedTileType,
@@ -196,6 +232,12 @@ const EditDashboardBody = ({
     left: 0,
     display: 'none',
   });
+
+  const btnStyle = {
+    marginRight: '10px',
+    color: isDarkMode ? '#EDECEB' : '#1976d2',
+    borderColor: isDarkMode ? '#EDECEB' : '#1976d2',
+  };
 
   const galleryOpen = () => {
     handleGalleryVisible();
@@ -261,12 +303,12 @@ const EditDashboardBody = ({
     draggingTop = Math.round((clientY - tileGridRect.top) / 90) * 90;
     draggingLeft = Math.round((clientX - tileGridRect.left) / 90) * 90;
 
-    if (
-      dragTarget?.className.includes('MAU by month in the last 5 months') ||
-      dragTarget?.className.includes('Number of connections by application in the last 20 days')
-    ) {
+    if (dragTarget?.className.includes('Number of connections by application in the last 20 days')) {
       heightOfType = 355;
       WidthOfType = 535;
+    } else if (dragTarget?.className.includes('MAU by month in the last 5 months')) {
+      heightOfType = 355;
+      WidthOfType = 265;
     } else if (
       dragTarget?.className.includes('Active Users') ||
       dragTarget?.className.includes('Monthly Active User')
@@ -288,6 +330,7 @@ const EditDashboardBody = ({
       positionHeight: heightOfType,
       positionWidth: WidthOfType,
     }));
+
     setDragging(true);
   };
 
@@ -307,6 +350,8 @@ const EditDashboardBody = ({
         display: 'block',
       },
     ]);
+    // console.log(draggingTop);
+    // console.log(draggingLeft);
   };
 
   // 타일이 대시보드 밖으로 나갈 때
@@ -516,18 +561,13 @@ const EditDashboardBody = ({
         if (name === com.id) {
           return {
             ...com,
-            width: ratioWidth * 89,
-            height: ratioHeight * 89,
+            width: 85 + (ratioWidth - 1) * 90,
+            height: 85 + (ratioHeight - 1) * 90,
           };
         }
         return com;
       }),
     );
-    setPlaceholderPosition((prevDragPosition) => ({
-      ...prevDragPosition,
-      positionWidth: ratioWidth * 89,
-      positionHeight: ratioHeight * 89,
-    }));
   };
 
   // 대시보드 안의 컴포넌트들
@@ -547,6 +587,8 @@ const EditDashboardBody = ({
           isPreview={!clickPreview}
           handleDelete={handleDeleteComponent}
           handleContext={handleResizeContext}
+          apiInfo={apiInfo}
+          isDarkMode={isDarkMode}
         />
       );
     }
@@ -563,6 +605,8 @@ const EditDashboardBody = ({
           isPreview={!clickPreview}
           handleDelete={handleDeleteComponent}
           handleContext={handleResizeContext}
+          apiInfo={apiInfo}
+          isDarkMode={isDarkMode}
         />
       );
     }
@@ -579,6 +623,8 @@ const EditDashboardBody = ({
           isPreview={!clickPreview}
           handleDelete={handleDeleteComponent}
           handleContext={handleResizeContext}
+          apiInfo={apiInfo}
+          isDarkMode={isDarkMode}
         />
       );
     }
@@ -595,6 +641,7 @@ const EditDashboardBody = ({
           isPreview={!clickPreview}
           handleDelete={handleDeleteComponent}
           handleContext={handleResizeContext}
+          isDarkMode={isDarkMode}
         />
       );
     }
@@ -612,6 +659,8 @@ const EditDashboardBody = ({
           isPreview={!clickPreview}
           handleDelete={handleDeleteComponent}
           handleContext={handleResizeContext}
+          apiInfo={apiInfo}
+          isDarkMode={isDarkMode}
         />
       );
     }
@@ -628,6 +677,8 @@ const EditDashboardBody = ({
           isPreview={!clickPreview}
           handleDelete={handleDeleteComponent}
           handleContext={handleResizeContext}
+          apiInfo={apiInfo}
+          isDarkMode={isDarkMode}
         />
       );
     }
@@ -661,12 +712,12 @@ const EditDashboardBody = ({
   // 타일 갤러리에서 클릭 후 추가 버튼으로 컴포넌트 추가하기
   useEffect(() => {
     if (selectedTileType.clickedTile !== '') {
-      if (
-        selectedTileType.clickedTile === 'MAU by month in the last 5 months' ||
-        selectedTileType.clickedTile === 'Number of connections by application in the last 20 days'
-      ) {
+      if (selectedTileType.clickedTile === 'Number of connections by application in the last 20 days') {
         heightOfType = 355;
         WidthOfType = 535;
+      } else if (selectedTileType.clickedTile === 'MAU by month in the last 5 months') {
+        heightOfType = 355;
+        WidthOfType = 265;
       } else if (
         selectedTileType.clickedTile === 'Active Users' ||
         selectedTileType.clickedTile === 'Monthly Active User'
@@ -715,6 +766,7 @@ const EditDashboardBody = ({
         <div style={{ display: 'flex' }}>
           {clickPreview ? (
             <TextField
+              focused={!!isDarkMode}
               inputRef={dashboardTitleRef}
               placeholder="제목 없음"
               variant="outlined"
@@ -726,6 +778,8 @@ const EditDashboardBody = ({
                   height: '30px',
                   fontSize: '15px',
                   marginRight: '10px',
+                  color: isDarkMode ? '#EDECEB' : '#000',
+                  borderColor: isDarkMode ? '#EDECEB' : '#000',
                 },
               }}
             />
@@ -748,7 +802,7 @@ const EditDashboardBody = ({
           )}
 
           <Button
-            style={btnStyle}
+            style={{ marginRight: '10px', color: '#EDECEB' }}
             variant="contained"
             color="primary"
             size="small"
@@ -784,6 +838,26 @@ const EditDashboardBody = ({
         )}
       </Explain>
       <EditDashboard>
+        {isDarkMode && clickPreview ? (
+          <>
+            <DarkModeDashboardSize style={{ width: '1024px', height: '768px' }}>
+              <span style={{ position: 'absolute', bottom: '5px', right: '5px' }}>1024 x 768</span>
+            </DarkModeDashboardSize>
+            <DarkModeDashboardSize style={{ width: '1366px', height: '768px' }}>
+              <span style={{ position: 'absolute', bottom: '5px', right: '5px' }}>1366 x 768</span>
+            </DarkModeDashboardSize>
+            <DarkModeDashboardSize style={{ width: '1440px', height: '900px' }}>
+              <span style={{ position: 'absolute', bottom: '5px', right: '5px' }}>1440 x 900</span>
+            </DarkModeDashboardSize>
+            <DarkModeDashboardSize style={{ width: '1920px', height: '1080px' }}>
+              <span style={{ position: 'absolute', bottom: '5px', right: '5px' }}>1920 x 1080</span>
+            </DarkModeDashboardSize>
+            <DarkModeDashboardSize style={{ width: '3840px', height: '2160px' }}>
+              <span style={{ position: 'absolute', bottom: '5px', right: '5px' }}>3840 x 2160</span>
+            </DarkModeDashboardSize>
+          </>
+        ) : null}
+
         <TileGrid
           ref={tileGridRef}
           onMouseDown={clickPreview ? handleMouseDown : undefined}
@@ -807,10 +881,11 @@ const EditDashboardBody = ({
               style={{
                 width: placeholderPosition.positionWidth,
                 height: placeholderPosition.positionHeight,
-                backgroundColor: 'rgba(0,0,0,0.125)',
+                backgroundColor: isDarkMode ? '#000' : 'rgba(0,0,0,0.125)',
                 boxSizing: 'border-box',
                 position: 'absolute',
-                border: '1px solid #e1dfdd',
+                border: '1px solid ',
+                borderColor: isDarkMode ? '#000' : '#e1dfdd',
                 boxShadow: '0 1.6px 3.6px 0 rgba(0, 0, 0, 0.132), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.108)',
                 top: placeholderPosition.positionTop,
                 left: placeholderPosition.positionLeft,

@@ -12,20 +12,19 @@ import {
   Grid,
 } from 'devextreme-react/chart';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
+import axios from 'axios';
+import { encode } from 'base-64';
 import styled from 'styled-components';
-import service from './data.js';
 import ActionTools from './ActionTools';
 
-const countriesInfo = service.getCountriesInfo();
-const energySources = service.getEnergySources();
-
 const CardBoard = styled.div`
-  border: 1px solid #e1dfdd;
+  border: 1px solid;
+  border-color: ${(props) => props.theme.borderColor};
   box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.132), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.108);
   box-sizing: border-box;
   padding: 10px;
-  background-color: white;
+  background-color: ${(props) => props.theme.bgColor};
   position: absolute;
   border-radius: 2px;
 
@@ -45,6 +44,12 @@ const CardTitle = styled.div`
   padding-left: 5px;
 `;
 
+interface apiInfoInterface {
+  gateway: string;
+  username: string;
+  password: string;
+}
+
 interface CardPosition {
   topPx: number;
   leftPx: number;
@@ -55,9 +60,12 @@ interface CardPosition {
   isPreview: boolean;
   handleDelete: ((event: React.MouseEvent) => void) | null;
   handleContext: ((name: string, ratioWidth: number, ratioHeight: number) => void) | null;
+  apiInfo: apiInfoInterface;
+  isDarkMode: boolean;
 }
 
 const LineChart = ({
+  isDarkMode,
   topPx,
   name,
   leftPx,
@@ -67,13 +75,49 @@ const LineChart = ({
   isPreview,
   handleDelete,
   handleContext,
+  apiInfo,
 }: CardPosition) => {
+  const credentials = encode(`${apiInfo.username}:${apiInfo.password}`);
+  const basicAuth = `Basic ${credentials}`;
   const cardBoardRef = useRef<HTMLDivElement>(null);
   const [depth, setDepth] = useState(991);
+  const [applicationData, setApplicationData] = useState({});
+  const paletteaa = ['#1976D2', '#10DED8', '#10B5E8', '#BCD104', '#D1382E', '#DB9827'];
+
+  const applicationSources = [
+    { value: 'Billing', name: 'Billing' },
+    { value: 'SalesOps', name: 'SalesOps' },
+    { value: 'colson', name: 'colson' },
+    { value: 'iam', name: 'iam' },
+    { value: 'matecdn_back', name: 'matecdn_back' },
+    { value: 'matecdn_front', name: 'matecdn_front' },
+  ];
 
   const handleSelectCard = (dep: number) => {
     setDepth(dep);
   };
+
+  const getData = () => {
+    axios
+      .get(`${apiInfo.gateway}iam/metric/login/application/date`, {
+        headers: {
+          Authorization: basicAuth,
+        },
+        params: {
+          date: 20,
+        },
+      })
+      .then((response) => {
+        setApplicationData(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   return (
     <CardBoard
@@ -101,20 +145,25 @@ const LineChart = ({
       )}
 
       <CardTitle>
-        <span>최근 20일 간 일자별 애플리케이션별 접속 수</span>
+        <span style={{ color: isDarkMode ? '#EDECEB' : '#000' }}>최근 20일 간 일자별 애플리케이션별 접속 수</span>
+        <div>
+          <span style={{ color: isDarkMode ? 'lightgray' : 'gray', fontSize: '12px', fontWeight: 'normal' }}>
+            Number of connections by application in the last 20 days
+          </span>
+        </div>
       </CardTitle>
-      <div style={{ height: '100%', width: '100%' }}>
-        <Chart height="100%" width="100%" dataSource={countriesInfo}>
-          <CommonSeriesSettings argumentField="country" />
-          {energySources.map((item) => (
+      <div style={{ height: '95%', width: '100%' }}>
+        <Chart height="100%" width="100%" dataSource={applicationData} palette={paletteaa}>
+          <CommonSeriesSettings argumentField="date" />
+          {applicationSources.map((item) => (
             <Series key={item.value} valueField={item.value} name={item.name} />
           ))}
           <Margin bottom={20} />
-          <ArgumentAxis valueMarginsEnabled={false} discreteAxisDivisionMode="crossLabels">
+          <ArgumentAxis valueMarginsEnabled discreteAxisDivisionMode="crossLabels">
             <Grid visible />
           </ArgumentAxis>
           <Legend verticalAlignment="bottom" horizontalAlignment="center" itemTextPosition="bottom" />
-          <Export enabled />
+
           <Tooltip enabled />
         </Chart>
       </div>
@@ -122,4 +171,5 @@ const LineChart = ({
   );
 };
 
+// <Export enabled />
 export default LineChart;

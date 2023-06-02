@@ -1,14 +1,17 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import DataGrid, { Scrolling, Sorting, LoadPanel } from 'devextreme-react/data-grid';
+import axios from 'axios';
+import { encode } from 'base-64';
 import styled from 'styled-components';
 import ActionTools from './ActionTools';
 
 const CardBoard = styled.div`
-  border: 1px solid #e1dfdd;
+  border: 1px solid;
+  border-color: ${(props) => props.theme.borderColor};
   box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.132), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.108);
   box-sizing: border-box;
   padding: 10px;
-  background-color: white;
+  background-color: ${(props) => props.theme.bgColor};
   position: absolute;
   border-radius: 2px;
 
@@ -18,7 +21,6 @@ const CardBoard = styled.div`
   min-height: 84px;
   min-width: 84px;
 `;
-
 const CardTitle = styled.div`
   width: 100%;
   height: auto;
@@ -27,6 +29,19 @@ const CardTitle = styled.div`
   font-weight: bold;
   padding-left: 5px;
 `;
+
+interface apiInfoInterface {
+  gateway: string;
+  username: string;
+  password: string;
+}
+
+interface userInterface {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
 
 interface CardPosition {
   topPx: number;
@@ -38,6 +53,8 @@ interface CardPosition {
   isPreview: boolean;
   handleDelete: ((event: React.MouseEvent) => void) | null;
   handleContext: ((name: string, ratioWidth: number, ratioHeight: number) => void) | null;
+  apiInfo: apiInfoInterface;
+  isDarkMode: boolean;
 }
 
 const UserList = ({
@@ -50,41 +67,56 @@ const UserList = ({
   isPreview,
   handleDelete,
   handleContext,
+  apiInfo,
+  isDarkMode,
 }: CardPosition) => {
+  const credentials = encode(`${apiInfo.username}:${apiInfo.password}`);
+  const basicAuth = `Basic ${credentials}`;
   const cardBoardRef = useRef<HTMLDivElement>(null);
   const [depth, setDepth] = useState(991);
-
-  const items = [
-    {
-      id: '744f5b22-819f-476c-a4d9-648f3d2f2b72',
-      firstName: '운영자',
-      lastName: null,
-      email: null,
-    },
-    {
-      id: '2392d0dc-2d1a-4b12-911e-6c6c32660cea',
-      firstName: 'cheongho',
-      lastName: 'bae',
-      email: 'cheongho.bae@cloudmt.co.kr',
-    },
-    {
-      id: '6c762bc1-e410-40d8-90e5-eaf91bcad628',
-      firstName: 'colson-user',
-      lastName: 'cm-app',
-      email: 'sdev@cloudmt.co.kr',
-    },
-    {
-      id: '0b41e44a-c4d8-405b-8a2c-8fa9544ecced',
-      firstName: 'cm-rssmonitor',
-      lastName: 'cm-rssmonitor',
-      email: 'le@cloudmt.co.kr',
-    },
-  ];
+  const [userData, setUserData] = useState<userInterface[]>([]);
 
   const handleSelectCard = (dep: number) => {
     setDepth(dep);
   };
 
+  const getData = () => {
+    axios
+      .get(`${apiInfo.gateway}iam/users`, {
+        headers: {
+          Authorization: basicAuth,
+        },
+      })
+      .then((response) => {
+        const newUserData = response.data.map((obj: any) => {
+          return {
+            id: obj.id,
+            firstName: obj.firstName,
+            lastName: obj.lastName,
+            email: obj.email,
+          };
+        });
+        setUserData(newUserData);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  useEffect(() => {
+    getData();
+
+    const gridElements = document.getElementsByClassName('dx-datagrid');
+
+    // 스타일을 변경할 엘리먼트들에 대해 반복문 실행
+    for (let i = 0; i < gridElements.length; i += 1) {
+      const gridElement = gridElements[i] as HTMLElement;
+
+      // 스타일 변경
+      gridElement.style.backgroundColor = isDarkMode ? '#1B1A19' : '#fff';
+      gridElement.style.color = isDarkMode ? '#EDECEB' : '#000';
+    }
+  }, []);
   return (
     <CardBoard
       ref={cardBoardRef}
@@ -111,10 +143,15 @@ const UserList = ({
       )}
 
       <CardTitle>
-        <span>유저 리스트</span>
+        <span style={{ color: isDarkMode ? '#EDECEB' : '#000' }}>유저 리스트</span>
+        <div>
+          <span style={{ color: isDarkMode ? 'lightgray' : 'gray', fontSize: '12px', fontWeight: 'normal' }}>
+            User List
+          </span>
+        </div>
       </CardTitle>
-      <div style={{ height: '100%', width: '100%', padding: '10px 0px' }}>
-        <DataGrid height={heightPx - 50} dataSource={items} keyExpr="id" showBorders>
+      <div style={{ height: '90%', width: '100%', padding: '10px 0px' }}>
+        <DataGrid height={heightPx - 70} dataSource={userData} keyExpr="id" showBorders>
           <Sorting mode="none" />
           <Scrolling mode="infinite" />
           <LoadPanel enabled={false} />

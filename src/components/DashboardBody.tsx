@@ -22,14 +22,22 @@ interface ComponentPosition {
   height: number;
   display: string;
 }
+interface apiInfoInterface {
+  gateway: string;
+  username: string;
+  password: string;
+}
 
 interface MyComponentProps {
+  apiInfo: apiInfoInterface;
   handleOpenEditDashboard: (editTarget: string | null) => void;
+  isDarkMode: boolean;
 }
 
 interface LocalStorageType {
   dashboardTitle: string;
   components: ComponentPosition[];
+  saveDate: string;
 }
 
 const ContentTop = styled.div`
@@ -42,18 +50,21 @@ const ContentTop = styled.div`
   margin-top: 20px;
   box-sizing: border-box;
   justify-content: start;
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
 `;
 
 const DefaultDashboard = styled.div`
   width: auto;
   height: auto;
-  background-color: white;
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
   padding: 0px 2px;
   display: flex;
   align-items: center;
   cursor: pointer;
   &:hover {
-    background-color: #e1dfdd;
+    background-color: ${(props) => props.theme.hoverColor};
   }
 `;
 
@@ -63,7 +74,8 @@ const DashboardList = styled.ul`
   max-height: 100px;
   border: 1px solid #e1dfdd;
   border-radius: 1px;
-  background-color: white;
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
   margin: 0;
   padding: 0;
   overflow-y: auto;
@@ -80,15 +92,18 @@ const DashboardElement = styled.li`
   font-size: 13px;
   cursor: pointer;
   &:hover {
-    background-color: #f1f3f5;
+    background-color: ${(props) => props.theme.hoverColor};
   }
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
 `;
 
 const ToolBox = styled.div`
   display: flex;
   width: auto;
   height: 30px;
-  background-color: white;
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
   margin-left: 20px;
 `;
 
@@ -100,11 +115,29 @@ const Tool = styled.div`
   height: 100%;
   padding: 0px 10px;
   font-size: 14px;
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
   cursor: pointer;
   &:hover {
-    background-color: #f1f3f5;
+    background-color: ${(props) => props.theme.hoverColor};
   }
 `;
+
+const LastUpdate = styled.div`
+  display: flex;
+  align-items: end;
+  text-align: center;
+  width: auto;
+  height: auto;
+  padding: 0px 10px;
+  font-size: 12px;
+  right: 80px;
+  top: 45px;
+  position: absolute;
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
+`;
+
 const EditDashboard = styled.div`
   z-index: 990;
   width: 100%;
@@ -116,12 +149,14 @@ const EditDashboard = styled.div`
   display: block;
   flex: 1 1 auto;
   box-sizing: border-box;
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
 `;
 
 const TileGrid = styled.div`
   display: block;
-
-  background-color: white;
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
   width: auto;
   height: auto;
   min-width: 1024px;
@@ -138,7 +173,7 @@ const TileGrid = styled.div`
   background-size: auto;
 `;
 
-const DashboardBody = ({ handleOpenEditDashboard }: MyComponentProps) => {
+const DashboardBody = ({ apiInfo, handleOpenEditDashboard, isDarkMode }: MyComponentProps) => {
   const [isSaving, setIsSaving] = useState(true);
   const [clickedDashboardList, setClickedDashboardList] = useState(false);
   const [parsedData, setParsedData] = useState<LocalStorageType[]>([]);
@@ -268,6 +303,11 @@ const DashboardBody = ({ handleOpenEditDashboard }: MyComponentProps) => {
           <Tool onClick={testDelete}>
             <span style={{ marginLeft: '5px' }}>로컬 스토리지삭제(테스트용)</span>
           </Tool>
+          {parsedData && parsedData.length > 0 ? (
+            <LastUpdate>
+              <span>마지막으로 업데이트한 날짜: {parsedData[0].saveDate}</span>
+            </LastUpdate>
+          ) : null}
         </ToolBox>
       </ContentTop>
       <EditDashboard>
@@ -287,6 +327,8 @@ const DashboardBody = ({ handleOpenEditDashboard }: MyComponentProps) => {
                       isPreview={isSaving}
                       handleDelete={null}
                       handleContext={null}
+                      apiInfo={apiInfo}
+                      isDarkMode={isDarkMode}
                     />
                   );
                 }
@@ -303,6 +345,8 @@ const DashboardBody = ({ handleOpenEditDashboard }: MyComponentProps) => {
                       isPreview={isSaving}
                       handleDelete={null}
                       handleContext={null}
+                      apiInfo={apiInfo}
+                      isDarkMode={isDarkMode}
                     />
                   );
                 }
@@ -319,6 +363,7 @@ const DashboardBody = ({ handleOpenEditDashboard }: MyComponentProps) => {
                       isPreview={isSaving}
                       handleDelete={null}
                       handleContext={null}
+                      isDarkMode={isDarkMode}
                     />
                   );
                 }
@@ -335,6 +380,8 @@ const DashboardBody = ({ handleOpenEditDashboard }: MyComponentProps) => {
                       isPreview={isSaving}
                       handleDelete={null}
                       handleContext={null}
+                      apiInfo={apiInfo}
+                      isDarkMode={isDarkMode}
                     />
                   );
                 }
@@ -352,6 +399,8 @@ const DashboardBody = ({ handleOpenEditDashboard }: MyComponentProps) => {
                       isPreview={isSaving}
                       handleDelete={null}
                       handleContext={null}
+                      apiInfo={apiInfo}
+                      isDarkMode={isDarkMode}
                     />
                   );
                 }
@@ -368,6 +417,8 @@ const DashboardBody = ({ handleOpenEditDashboard }: MyComponentProps) => {
                       isPreview={isSaving}
                       handleDelete={null}
                       handleContext={null}
+                      apiInfo={apiInfo}
+                      isDarkMode={isDarkMode}
                     />
                   );
                 }

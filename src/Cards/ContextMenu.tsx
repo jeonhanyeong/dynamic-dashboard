@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import SettingsIcon from '@mui/icons-material/Settings';
 import AspectRatioIcon from '@mui/icons-material/AspectRatio';
 import { useEffect, useState } from 'react';
 
@@ -9,10 +10,12 @@ const Menu = styled.div`
   max-height: 100vh;
   overflow-x: hidden;
   overflow-y: auto;
-  border: 1px solid #e1dfdd;
+  border: 1px solid;
+  border-color: ${(props) => props.theme.borderColor};
   box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.132), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.108);
   box-sizing: border-box;
-  background-color: white;
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
   box-sizing: border-box;
 `;
 
@@ -31,7 +34,7 @@ const Elements = styled.li`
   padding: 5px;
   cursor: pointer;
   &:hover {
-    background-color: #e1dfdd;
+    background-color: ${(props) => props.theme.hoverColor};
   }
 `;
 
@@ -46,6 +49,7 @@ interface ContextMenuProps {
   handleContext: ((name: string, ratioWidth: number, ratioHeight: number) => void) | null;
   handleResizeRatioClick: (id: string) => void;
   currentRatio: string;
+  handleSettingOpen: () => void;
 }
 
 interface resizeOption {
@@ -62,22 +66,19 @@ const ContextMenu = ({
   handleContext,
   handleResizeRatioClick,
   currentRatio,
+  handleSettingOpen,
 }: ContextMenuProps) => {
   const [resizeClick, setResizeClick] = useState<resizeOption[]>([
-    { id: 're-1', width: 2, height: 1, state: false },
-    { id: 're-2', width: 2, height: 2, state: false },
     { id: 're-3', width: 2, height: 4, state: false },
     { id: 're-4', width: 4, height: 2, state: false },
     { id: 're-5', width: 4, height: 3, state: false },
-    { id: 're-6', width: 4, height: 4, state: false },
     { id: 're-7', width: 6, height: 3, state: false },
-    { id: 're-8', width: 6, height: 4, state: true },
     { id: 're-9', width: 6, height: 6, state: false },
   ]);
 
   const handleResizeContext = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
-    if (target.tagName.toLowerCase() === 'path') {
+    if (target.tagName.toLowerCase() === 'path' || target.tagName.toLowerCase() === 'svg') {
       const parentElement = target.parentNode as HTMLElement;
       const parentClassList = parentElement.classList;
       const findPathContext = resizeClick.find((rc) => parentClassList.contains(rc.id));
@@ -94,6 +95,9 @@ const ContextMenu = ({
     }
   };
 
+  const settingOpen = () => {
+    handleSettingOpen();
+  };
   useEffect(() => {
     const updatedResizeClick = resizeClick.map((rc) => ({
       ...rc,
@@ -111,6 +115,10 @@ const ContextMenu = ({
       }}
     >
       <MenuList onClick={handleResizeContext}>
+        <Elements onClick={settingOpen}>
+          <SettingsIcon style={IconStyle} />
+          &nbsp;&nbsp; 타일 설정
+        </Elements>
         {resizeClick.map((re) => {
           if (re.state === false) {
             return (

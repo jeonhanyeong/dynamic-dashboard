@@ -6,26 +6,8 @@ import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNone
 import styled from 'styled-components';
 
 type MyComponentProps = {
+  isDarkMode: boolean;
   handleSettingVisible: () => void;
-};
-
-const toolbarStlye = {
-  minHeight: '40px',
-};
-
-const titleStyle = {
-  flexGrow: 1,
-  fontSize: 15,
-  marginLeft: 20,
-};
-
-const appbarStyle = {
-  backgroundColor: '#1565c0',
-  color: '#fff',
-  height: '40px',
-
-  zIndex: 999,
-  minHeight: '40px',
 };
 
 const NavMenu = styled.div`
@@ -34,16 +16,38 @@ const NavMenu = styled.div`
   height: 40px;
   align-items: center;
   padding: 0px 10px;
+  color: #edeceb;
 
   &:hover {
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: ${(props) => props.theme.navHoverColor};
   }
   cursor: pointer;
 `;
 
-const TopNavBar = ({ handleSettingVisible }: MyComponentProps) => {
+const TopNavBar = ({ isDarkMode, handleSettingVisible }: MyComponentProps) => {
   const openSetting = () => {
     handleSettingVisible();
+  };
+
+  const appbarStyle = {
+    backgroundColor: isDarkMode ? '#252423' : '#1976d2',
+    color: '#fff',
+    height: '40px',
+
+    zIndex: 999,
+    minHeight: '40px',
+  };
+
+  const toolbarStlye = {
+    minHeight: '40px',
+    color: isDarkMode ? '#EDECEB' : '#fff',
+  };
+
+  const titleStyle = {
+    flexGrow: 1,
+    fontSize: 17,
+    marginLeft: 20,
+    color: isDarkMode ? '#EDECEB' : '#fff',
   };
 
   return (

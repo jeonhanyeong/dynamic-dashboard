@@ -1,6 +1,12 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import CardMedia from '@mui/material/CardMedia';
+
+import barChartImage from '../assets/images/barChartIcon.png';
+import lineChartImage from '../assets/images/lineChartIcon.png';
+import userImage from '../assets/images/usersIcon.png';
+import timeImage from '../assets/images/timeIcon.png';
+import listImage from '../assets/images/listIcon.png';
 import testImage from '../assets/images/test.png';
 
 const Card = styled.div`
@@ -11,8 +17,8 @@ const Card = styled.div`
 `;
 
 const media = {
-  flex: '0 0 80px',
-  height: '80px',
+  flex: '0 0 70px',
+  height: '70px',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
@@ -60,9 +66,25 @@ const TileCard = ({ type, tileDescription }: TileCardProps) => {
     event.preventDefault();
   };
 
+  // type에 따라 이미지 선택
+  let image;
+  if (type === 'Active Users' || type === 'Monthly Active User') {
+    image = userImage;
+  } else if (type === 'MAU by month in the last 5 months') {
+    image = barChartImage;
+  } else if (type === 'Number of connections by application in the last 20 days') {
+    image = lineChartImage;
+  } else if (type === 'User List') {
+    image = listImage;
+  } else if (type === 'Server Time') {
+    image = timeImage; // 기본 이미지
+  } else {
+    image = testImage;
+  }
+
   return (
     <Card draggable className={classes} onDragStart={handleDragStart} onDragOver={handleDragOver} onDrop={handleDrop}>
-      <CardMedia style={media} image={testImage} title="Title" />
+      <CardMedia style={media} component="img" image={image} title="Title" sx={{ padding: '5px' }} />
       <CardContent>
         <CardTitle>
           <strong>{type}</strong>

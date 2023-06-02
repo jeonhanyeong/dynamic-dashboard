@@ -1,13 +1,28 @@
 import 'devextreme/dist/css/dx.light.css';
 import './App.css';
 import { useEffect, useState, useRef } from 'react';
-import styled from 'styled-components';
+import styled, { createGlobalStyle, ThemeProvider } from 'styled-components';
+import reset from 'styled-reset';
+import { darkTheme, lightTheme } from './styles/theme';
 import TileGallery from './components/TileGallery';
 import TopNavBar from './components/TopNavBar';
 import EditDashboardBody from './components/EditDashboardBody';
 import DashboardBody from './components/DashboardBody';
 import ModeSetting from './components/ModeSetting';
 
+const GlobalStyle = createGlobalStyle`
+  ${reset}  
+  body {        
+    background-color: ${(props) => props.theme.bgColor};
+    color:${(props) => props.theme.textColor};
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+    -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  }  
+  
+`;
 const WebContainer = styled.div`
   position: fixed;
   left: 0;
@@ -25,6 +40,8 @@ const WebContainer = styled.div`
   margin: 0;
   padding: 0;
   overflow: hidden;
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
 `;
 
 const Contents = styled.div`
@@ -36,6 +53,8 @@ const Contents = styled.div`
   min-height: 0;
   height: 100%;
   width: 100%;
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
 `;
 const Dashboard = styled.div`
   position: absolute;
@@ -47,15 +66,10 @@ const Dashboard = styled.div`
   display: flex;
   flex-flow: column nowrap;
   overflow: hidden;
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
 `;
 
-const NoDashboard = styled.div`
-  position: absolute;
-  width: 200px;
-  height: 100px;
-  display: flex;
-  background-color: red;
-`;
 interface ComponentPosition {
   id: string;
   top: number;
@@ -74,8 +88,21 @@ interface TileInfo {
   title: string;
   description: string;
 }
+
+interface apiInfoInterface {
+  gateway: string;
+  username: string;
+  password: string;
+}
 const App = () => {
+  const apiInfo: apiInfoInterface = {
+    gateway: 'https://gw.cloudmt.co.kr/',
+    username: 'dashboard_api',
+    password: 'zmffkdnemapdlxm1Emd!',
+  };
   const parent = useRef<HTMLDivElement>(null);
+  // const setting = useRef<HTMLDivElement>(null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [dragTarget, setDragTarget] = useState<HTMLDivElement | null>(null);
   const [galleryVisible, setGalleryVisible] = useState(false);
   const [settingVisible, setSettingVisible] = useState(false);
@@ -113,6 +140,11 @@ const App = () => {
     clickedTile: '',
     clickedCount: 0,
   });
+
+  const handleModeChange = (changeMode: boolean) => {
+    setIsDarkMode(changeMode);
+    localStorage.setItem('mode', JSON.stringify(changeMode));
+  };
 
   const addToLocalStorage = (key: string, value: LocalStorageData) => {
     // 기존에 저장된 데이터 가져오기
@@ -168,6 +200,7 @@ const App = () => {
 
   const handleOpenDashboard = () => {
     setIsEditDashboard(!isEditDashboard);
+    setGalleryVisible(false);
   };
 
   const handleIsPreview = () => {
@@ -178,7 +211,16 @@ const App = () => {
 
   // 저장 버튼을 눌렀을 때
   const handleSaveDashboard = (title: string, comp: ComponentPosition[]) => {
-    const data = { dashboardTitle: title, components: comp };
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    const saved = `${year}-${month}-${day} ${hours}: ${minutes}: ${seconds}`;
+
+    const data = { dashboardTitle: title, components: comp, saveDate: saved };
     addToLocalStorage('dashboard', data);
 
     if (galleryVisible) {
@@ -217,9 +259,16 @@ const App = () => {
     setIsEditDashboard(!isEditDashboard);
   };
 
+  const settingClose = () => {
+    setSettingVisible(false);
+  };
+
   useEffect(() => {
     const parentComponent = parent.current as HTMLDivElement;
     parentComponent.addEventListener('dragstart', handleDragStart);
+
+    const modeData = localStorage.getItem('mode');
+    setIsDarkMode(modeData ? JSON.parse(modeData) : false);
 
     return () => {
       parentComponent.removeEventListener('dragstart', handleDragStart);
@@ -227,40 +276,49 @@ const App = () => {
   }, []);
 
   return (
-    <WebContainer>
-      <TopNavBar handleSettingVisible={handleSettingVisible} />
-      <Contents ref={parent}>
-        {isEditDashboard ? null : (
-          <Dashboard>
-            <DashboardBody handleOpenEditDashboard={handleOpenEditDashboard} />
-          </Dashboard>
-        )}
+    <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
+      <WebContainer>
+        <TopNavBar handleSettingVisible={handleSettingVisible} isDarkMode={isDarkMode} />
+        <Contents ref={parent}>
+          {isEditDashboard ? null : (
+            <Dashboard>
+              <DashboardBody
+                apiInfo={apiInfo}
+                handleOpenEditDashboard={handleOpenEditDashboard}
+                isDarkMode={isDarkMode}
+              />
+            </Dashboard>
+          )}
 
-        {isEditDashboard && (
-          <Dashboard>
-            <EditDashboardBody
-              dragTarget={dragTarget}
-              dragTargetType={dragTargetType}
-              selectedTileType={selectedTileType}
-              editTarget={isEditTarget}
+          {isEditDashboard && (
+            <Dashboard>
+              <EditDashboardBody
+                isDarkMode={isDarkMode}
+                apiInfo={apiInfo}
+                dragTarget={dragTarget}
+                dragTargetType={dragTargetType}
+                selectedTileType={selectedTileType}
+                editTarget={isEditTarget}
+                handleGalleryVisible={handleGalleryVisible}
+                handleOpenDashboard={handleOpenDashboard}
+                handleSaveDashboard={handleSaveDashboard}
+                handleEditSaveDashboard={handleEditSaveDashboard}
+                handleIsPreview={handleIsPreview}
+              />
+            </Dashboard>
+          )}
+          {galleryVisible && (
+            <TileGallery
+              isDarkMode={isDarkMode}
+              tileTypes={tileTypes}
               handleGalleryVisible={handleGalleryVisible}
-              handleOpenDashboard={handleOpenDashboard}
-              handleSaveDashboard={handleSaveDashboard}
-              handleEditSaveDashboard={handleEditSaveDashboard}
-              handleIsPreview={handleIsPreview}
+              handleAddComponentByClick={handleAddComponentByClick}
             />
-          </Dashboard>
-        )}
-        {galleryVisible && (
-          <TileGallery
-            tileTypes={tileTypes}
-            handleGalleryVisible={handleGalleryVisible}
-            handleAddComponentByClick={handleAddComponentByClick}
-          />
-        )}
-        {settingVisible && <ModeSetting />}
-      </Contents>
-    </WebContainer>
+          )}
+          {settingVisible && <ModeSetting handleModeChange={handleModeChange} />}
+        </Contents>
+      </WebContainer>
+    </ThemeProvider>
   );
 };
 

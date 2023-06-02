@@ -6,6 +6,21 @@ import styled from 'styled-components';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ContextMenu from './ContextMenu';
 
+const TileSettingContents = styled.div`
+  /* 스타일 작성 */
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
+  padding: 10px;
+  width: 20%;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  border-left: 1px solid;
+  border-color: ${(props) => props.theme.borderColor};
+  padding: 0;
+  z-index: 998;
+`;
+
 const Cover = styled.div`
   top: 0;
   left: 0;
@@ -14,8 +29,8 @@ const Cover = styled.div`
   box-sizing: border-box;
   padding: 0;
   margin: 0;
-  opacity: 0.5;
-  background-color: white;
+  opacity: 0.8;
+  background-color: ${(props) => props.theme.bgColor};
   z-index: 998;
   position: absolute;
   display: block;
@@ -32,8 +47,9 @@ const ResizeHandle = styled.div`
   position: absolute;
   cursor: se-resize;
   z-index: 999;
-  border-bottom: 2px solid lightgray;
-  border-right: 2px solid lightgray;
+  border-bottom: 1px solid;
+  border-right: 1px solid;
+  border-color: ${(props) => props.theme.borderColor};
 `;
 
 const ActionBar = styled.div`
@@ -70,7 +86,7 @@ const ActionTools = ({ name, handleDelete, handleSelectCard, handleContext }: My
   const coverRef = useRef<HTMLDivElement>(null);
   const resizeHandleRef = useRef<HTMLDivElement>(null);
   const [currentRatio, setCurrentRatio] = useState('re-8');
-
+  const [isSettingOpen, setIsSettingOpen] = useState(false);
   const [openContextMenu, setOpenContextMenu] = useState<ContextMenuPosition>({
     state: false,
     top: 0,
@@ -81,7 +97,12 @@ const ActionTools = ({ name, handleDelete, handleSelectCard, handleContext }: My
     opacity: 0.5,
   });
 
-  const handleMouseEnter = () => {
+  const handleSettingOpen = () => {
+    setIsSettingOpen(!isSettingOpen);
+  };
+
+  const handleMouseEnter = (event: MouseEvent) => {
+    // console.log(event.target);
     handleSelectCard(1000);
     setStyleState((prev) => ({
       ...prev,
@@ -90,13 +111,15 @@ const ActionTools = ({ name, handleDelete, handleSelectCard, handleContext }: My
     }));
   };
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = (event: MouseEvent) => {
+    console.log(event.target);
     handleSelectCard(991);
     setStyleState((prev) => ({
       ...prev,
       display: 'none',
       opacity: 0.5,
     }));
+
     setOpenContextMenu((prev) => ({
       ...prev,
       state: false,
@@ -110,6 +133,8 @@ const ActionTools = ({ name, handleDelete, handleSelectCard, handleContext }: My
   };
 
   const handleContextMenuClick = (event: React.MouseEvent) => {
+    const actionBar = actionBarRef.current as HTMLDivElement;
+    actionBar.removeEventListener('mouseleave', handleMouseLeave);
     const element = event.currentTarget as HTMLButtonElement;
 
     const rect = element.getBoundingClientRect();
@@ -157,6 +182,7 @@ const ActionTools = ({ name, handleDelete, handleSelectCard, handleContext }: My
 
   return (
     <>
+      {isSettingOpen ? <TileSettingContents /> : null}
       <Cover
         ref={coverRef}
         className="Card-Cover"
@@ -178,6 +204,7 @@ const ActionTools = ({ name, handleDelete, handleSelectCard, handleContext }: My
             ContextLeft={openContextMenu.left}
             handleContext={handleContext}
             handleResizeRatioClick={handleResizeRatioClick}
+            handleSettingOpen={handleSettingOpen}
             currentRatio={currentRatio}
           />
         )}

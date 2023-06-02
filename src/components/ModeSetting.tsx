@@ -1,17 +1,20 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 import Grid from '@mui/material/Grid';
 import lightMode from '../assets/images/lightDashboard.png';
 import darkMode from '../assets/images/darkDashboard.png';
 
 const Setting = styled.div`
-  background-color: #fff;
-  color: #000;
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
   padding: 10px;
   width: 15%;
-  height: 25%;
+  height: 30%;
   position: absolute;
   right: 0;
-  border: 1px solid lightgray;
+  border-bottom: 1px solid;
+  border-left: 1px solid;
+  border-color: ${(props) => props.theme.borderColor};
   padding: 0;
   z-index: 1000;
 `;
@@ -20,23 +23,25 @@ const SettingHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-
+  margin-left: 10px;
   padding: 0 10px;
 `;
 
 const SettingBody = styled.div`
-  margin: 0;
   padding: 0 15px;
   display: flex;
   flex-flow: column nowrap;
   box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
 `;
 
 const SettingLabel = styled.div`
-  width: 100%;
-  height: 5%;
-  font-size: 13px;
-  color: #000;
+  width: auto;
+  height: auto;
+  font-size: 14px;
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
   margin-top: 10px;
   padding: 0;
 `;
@@ -47,6 +52,8 @@ const ModeChange = styled.div`
   width: 110px;
   height: 110px;
   box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
 `;
 
 const Mode = styled.div`
@@ -61,14 +68,31 @@ const Mode = styled.div`
   display: flex;
   flex-flow: column nowrap;
   cursor: pointer;
-  transition: box-shadow 0.2s ease-in-out;
+  // transition: box-shadow 0.2s ease-in-out;
   &:hover {
-    box-shadow: 0 0 0 1px #bcbcbc;
+    box-shadow: 0 0 0 1px #bcbcbc !important;
     font-weight: bold;
   }
 `;
 
-const ModeSetting = () => {
+interface modeInfo {
+  handleModeChange: (changeMode: boolean) => void;
+}
+
+const ModeSetting = ({ handleModeChange }: modeInfo) => {
+  const [isLightClicked, setIsLightClicked] = useState(false);
+  const [isDarkClicked, setIsDarkClicked] = useState(false);
+  const handleChangeLight = () => {
+    setIsDarkClicked(false);
+    setIsLightClicked(true);
+    handleModeChange(false);
+  };
+  const handleChangeDark = () => {
+    setIsDarkClicked(true);
+    setIsLightClicked(false);
+    handleModeChange(true);
+  };
+
   return (
     <Setting>
       <SettingHeader>
@@ -77,13 +101,13 @@ const ModeSetting = () => {
       <SettingBody>
         <SettingLabel>테마 변경</SettingLabel>
         <ModeChange>
-          <Mode>
+          <Mode onClick={handleChangeLight} style={{ boxShadow: isLightClicked ? '0 0 0 1px #bcbcbc' : 'none' }}>
             <img src={`${lightMode}`} width="80px" height="80px" alt="라이트모드" loading="lazy" />
-            <span>밝게</span>
+            <span style={{ marginTop: '5px' }}>밝게</span>
           </Mode>
-          <Mode>
+          <Mode onClick={handleChangeDark} style={{ boxShadow: isDarkClicked ? '0 0 0 1px #bcbcbc' : 'none' }}>
             <img src={`${darkMode}`} width="80px" height="80px" alt="다크모드" loading="lazy" />
-            <span>어둡게</span>
+            <span style={{ marginTop: '5px' }}>어둡게</span>
           </Mode>
         </ModeChange>
       </SettingBody>
