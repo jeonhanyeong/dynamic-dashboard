@@ -96,7 +96,8 @@ const ContextMenu = ({
   };
 
   const settingOpen = () => {
-    handleSettingOpen();
+   //  handleSettingOpen();
+  
   };
   useEffect(() => {
     const updatedResizeClick = resizeClick.map((rc) => ({
@@ -115,7 +116,7 @@ const ContextMenu = ({
       }}
     >
       <MenuList onClick={handleResizeContext}>
-        <Elements onClick={settingOpen}>
+        <Elements  className={name} onClick={settingOpen}>
           <SettingsIcon style={IconStyle} />
           &nbsp;&nbsp; 타일 설정
         </Elements>

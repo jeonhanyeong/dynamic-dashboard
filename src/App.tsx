@@ -279,7 +279,7 @@ const App = () => {
     <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
       <WebContainer>
         <TopNavBar handleSettingVisible={handleSettingVisible} isDarkMode={isDarkMode} />
-        <Contents ref={parent}>
+        <Contents ref={parent} className={isDarkMode ? 'viewport dx-theme-dark' : 'viewport dx-theme-light'}>
           {isEditDashboard ? null : (
             <Dashboard>
               <DashboardBody
@@ -315,7 +315,13 @@ const App = () => {
               handleAddComponentByClick={handleAddComponentByClick}
             />
           )}
-          {settingVisible && <ModeSetting handleModeChange={handleModeChange} />}
+          {settingVisible && (
+            <ModeSetting
+              contentsRef={parent.current as HTMLDivElement}
+              handleModeChange={handleModeChange}
+              settingClose={settingClose}
+            />
+          )}
         </Contents>
       </WebContainer>
     </ThemeProvider>

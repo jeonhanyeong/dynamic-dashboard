@@ -82,7 +82,7 @@ const LineChart = ({
   const cardBoardRef = useRef<HTMLDivElement>(null);
   const [depth, setDepth] = useState(991);
   const [applicationData, setApplicationData] = useState({});
-  const paletteaa = ['#1976D2', '#10DED8', '#10B5E8', '#BCD104', '#D1382E', '#DB9827'];
+  const paletteaa = ['#1976D2', '#10DED8', '#10B5E8', '#464EB8', '#D1382E', '#DB9827'];
 
   const applicationSources = [
     { value: 'Billing', name: 'Billing' },

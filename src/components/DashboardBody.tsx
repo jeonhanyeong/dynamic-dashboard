@@ -311,7 +311,7 @@ const DashboardBody = ({ apiInfo, handleOpenEditDashboard, isDarkMode }: MyCompo
         </ToolBox>
       </ContentTop>
       <EditDashboard>
-        <TileGrid ref={tileGridRef}>
+        <TileGrid className="dashborad-view" ref={tileGridRef}>
           {parsedData && parsedData.length > 0
             ? parsedData[0].components.map((com: ComponentPosition) => {
                 if (com.id.includes('Active Users')) {

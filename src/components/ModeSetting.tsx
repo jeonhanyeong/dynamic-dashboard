@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import Grid from '@mui/material/Grid';
 import lightMode from '../assets/images/lightDashboard.png';
@@ -76,12 +76,16 @@ const Mode = styled.div`
 `;
 
 interface modeInfo {
+  contentsRef: HTMLDivElement;
   handleModeChange: (changeMode: boolean) => void;
+  settingClose: () => void;
 }
 
-const ModeSetting = ({ handleModeChange }: modeInfo) => {
+const ModeSetting = ({ contentsRef, handleModeChange, settingClose }: modeInfo) => {
   const [isLightClicked, setIsLightClicked] = useState(false);
   const [isDarkClicked, setIsDarkClicked] = useState(false);
+  const settingRef = useRef<HTMLDivElement>(null);
+
   const handleChangeLight = () => {
     setIsDarkClicked(false);
     setIsLightClicked(true);
@@ -93,8 +97,24 @@ const ModeSetting = ({ handleModeChange }: modeInfo) => {
     handleModeChange(true);
   };
 
+  const clickClose = (e: MouseEvent) => {
+    const settingComponent = settingRef.current as HTMLDivElement;
+    const isClickedInside = settingComponent.contains(e.target as Node);
+    if (!isClickedInside) {
+      settingClose();
+    }
+  };
+
+  useEffect(() => {
+    contentsRef.addEventListener('click', clickClose);
+
+    return () => {
+      contentsRef.removeEventListener('click', clickClose);
+    };
+  }, []);
+
   return (
-    <Setting>
+    <Setting ref={settingRef}>
       <SettingHeader>
         <h1>설정</h1>
       </SettingHeader>
