@@ -9,5 +9,6 @@ declare module 'styled-components' {
     hoverColor: string;
     borderColor: string;
     navHoverColor: string;
+    scrollColor: string;
   }
 }

@@ -24,8 +24,8 @@
   color: #EDECEB;
 }
 .dx-theme-dark .dx-datagrid .dx-data-row:hover{
-  background-color: lightgray;
-  color: #EDECEB;
+  background-color: gray;
+  color: #fff;
 }
 .dx-theme-dark .dx-datagrid .dx-texteditor-input{
   color: #EDECEB;

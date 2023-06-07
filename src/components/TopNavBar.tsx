@@ -4,10 +4,15 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import styled from 'styled-components';
+import { useRef, useState } from 'react';
+import { useRaf } from 'react-use';
 
 type MyComponentProps = {
   isDarkMode: boolean;
-  handleSettingVisible: () => void;
+  handleSettingVisible: (right: number) => void;
+  handleNoticeVisible: (right: number) => void;
+  settingVisible: boolean;
+  noticeVisible: boolean;
 };
 
 const NavMenu = styled.div`
@@ -24,9 +29,32 @@ const NavMenu = styled.div`
   cursor: pointer;
 `;
 
-const TopNavBar = ({ isDarkMode, handleSettingVisible }: MyComponentProps) => {
+const TopNavBar = ({
+  isDarkMode,
+  handleSettingVisible,
+  handleNoticeVisible,
+  settingVisible,
+  noticeVisible,
+}: MyComponentProps) => {
+  const noticeRef = useRef<HTMLDivElement>(null);
+  const settingRef = useRef<HTMLDivElement>(null);
+
+  const openMessageNotice = () => {
+    const noticeComponent = noticeRef.current;
+    const screenWidth = window.innerWidth;
+    if (noticeComponent) {
+      const { right } = noticeComponent.getBoundingClientRect();
+      handleNoticeVisible(screenWidth - right - 1);
+    }
+  };
+
   const openSetting = () => {
-    handleSettingVisible();
+    const settingComponent = settingRef.current;
+    const screenWidth = window.innerWidth;
+    if (settingComponent) {
+      const { right } = settingComponent.getBoundingClientRect();
+      handleSettingVisible(screenWidth - right - 1);
+    }
   };
 
   const appbarStyle = {
@@ -56,10 +84,24 @@ const TopNavBar = ({ isDarkMode, handleSettingVisible }: MyComponentProps) => {
         <DashboardIcon />
         <h6 style={titleStyle}>Dynamic Dashboard </h6>
         {/* 주우서억 */}
-        <NavMenu>
+        <NavMenu
+          ref={noticeRef}
+          onClick={openMessageNotice}
+          style={{
+            backgroundColor: noticeVisible ? (isDarkMode ? '#1B1A19' : '#fff') : '',
+            color: noticeVisible ? (isDarkMode ? '#edeceb' : '#1976d2') : '#edeceb',
+          }}
+        >
           <NotificationsNoneOutlinedIcon fontSize="small" />
         </NavMenu>
-        <NavMenu onClick={openSetting}>
+        <NavMenu
+          ref={settingRef}
+          onClick={openSetting}
+          style={{
+            backgroundColor: settingVisible ? (isDarkMode ? '#1B1A19' : '#fff') : '',
+            color: settingVisible ? (isDarkMode ? '#edeceb' : '#1976d2') : '#edeceb',
+          }}
+        >
           <SettingsOutlinedIcon fontSize="small" />
         </NavMenu>
       </Toolbar>

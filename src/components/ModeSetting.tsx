@@ -11,9 +11,9 @@ const Setting = styled.div`
   width: 15%;
   height: 30%;
   position: absolute;
-  right: 0;
   border-bottom: 1px solid;
   border-left: 1px solid;
+  border-right: 1px solid;
   border-color: ${(props) => props.theme.borderColor};
   padding: 0;
   z-index: 1000;
@@ -79,9 +79,10 @@ interface modeInfo {
   contentsRef: HTMLDivElement;
   handleModeChange: (changeMode: boolean) => void;
   settingClose: () => void;
+  menuRightPx: number;
 }
 
-const ModeSetting = ({ contentsRef, handleModeChange, settingClose }: modeInfo) => {
+const ModeSetting = ({ contentsRef, handleModeChange, settingClose, menuRightPx }: modeInfo) => {
   const [isLightClicked, setIsLightClicked] = useState(false);
   const [isDarkClicked, setIsDarkClicked] = useState(false);
   const settingRef = useRef<HTMLDivElement>(null);
@@ -114,7 +115,7 @@ const ModeSetting = ({ contentsRef, handleModeChange, settingClose }: modeInfo) 
   }, []);
 
   return (
-    <Setting ref={settingRef}>
+    <Setting ref={settingRef} style={{ right: menuRightPx }}>
       <SettingHeader>
         <h1>설정</h1>
       </SettingHeader>

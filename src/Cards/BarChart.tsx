@@ -190,7 +190,7 @@ const BarChart = ({
       <CardTitle>
         <span style={{ color: isDarkMode ? '#EDECEB' : '#000' }}>최근 5개월 간 월별 활성 유저 수</span>
         <div>
-          <span style={{ color: isDarkMode ? 'lightgray' : 'gray', fontSize: '12px', fontWeight: 'normal' }}>
+          <span style={{ color: isDarkMode ? '#6F6E6D' : 'gray', fontSize: '12px', fontWeight: 'normal' }}>
             MAU by month in the last 5 months
           </span>
         </div>

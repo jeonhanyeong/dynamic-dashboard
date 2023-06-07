@@ -6,6 +6,7 @@ export const lightTheme = {
   hoverColor: '#f1f3f5',
   borderColor: 'lightgray',
   navHoverColor: '#3aa0f3',
+  scrollColor: '#1976d2',
 };
 
 export const darkTheme = {
@@ -16,6 +17,7 @@ export const darkTheme = {
   hoverColor: '#3e3d3c',
   borderColor: '#605e5c',
   navHoverColor: '#3e3d3c',
+  scrollColor: 'rgba(0, 0, 0, 0.3)',
 };
 
 export const theme = {

@@ -9,6 +9,7 @@ import TopNavBar from './components/TopNavBar';
 import EditDashboardBody from './components/EditDashboardBody';
 import DashboardBody from './components/DashboardBody';
 import ModeSetting from './components/ModeSetting';
+import MessageNotice from './components/MessageNotice';
 
 const GlobalStyle = createGlobalStyle`
   ${reset}  
@@ -105,6 +106,7 @@ const App = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [dragTarget, setDragTarget] = useState<HTMLDivElement | null>(null);
   const [galleryVisible, setGalleryVisible] = useState(false);
+  const [noticeVisible, setNoticeVisible] = useState(false);
   const [settingVisible, setSettingVisible] = useState(false);
   const [tileTypes, setTileTypes] = useState<TileInfo[]>([
     {
@@ -140,6 +142,7 @@ const App = () => {
     clickedTile: '',
     clickedCount: 0,
   });
+  const [menuRightPx, setMenuRightPx] = useState<number>(0);
 
   const handleModeChange = (changeMode: boolean) => {
     setIsDarkMode(changeMode);
@@ -168,8 +171,15 @@ const App = () => {
     setGalleryVisible(!galleryVisible); // 부모 컴포넌트의 상태를 변경
   };
 
-  const handleSettingVisible = () => {
+  const handleSettingVisible = (right: number) => {
+    setMenuRightPx(right);
     setSettingVisible(!settingVisible); // 부모 컴포넌트의 상태를 변경
+    setNoticeVisible(false);
+  };
+  const handleNoticeVisible = (right: number) => {
+    setMenuRightPx(right);
+    setNoticeVisible(!noticeVisible); // 부모 컴포넌트의 상태를 변경
+    setSettingVisible(false);
   };
 
   const handleDragStart = (event: DragEvent) => {
@@ -261,6 +271,7 @@ const App = () => {
 
   const settingClose = () => {
     setSettingVisible(false);
+    setNoticeVisible(false);
   };
 
   useEffect(() => {
@@ -278,7 +289,13 @@ const App = () => {
   return (
     <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
       <WebContainer>
-        <TopNavBar handleSettingVisible={handleSettingVisible} isDarkMode={isDarkMode} />
+        <TopNavBar
+          handleSettingVisible={handleSettingVisible}
+          handleNoticeVisible={handleNoticeVisible}
+          settingVisible={settingVisible}
+          noticeVisible={noticeVisible}
+          isDarkMode={isDarkMode}
+        />
         <Contents ref={parent} className={isDarkMode ? 'viewport dx-theme-dark' : 'viewport dx-theme-light'}>
           {isEditDashboard ? null : (
             <Dashboard>
@@ -320,6 +337,16 @@ const App = () => {
               contentsRef={parent.current as HTMLDivElement}
               handleModeChange={handleModeChange}
               settingClose={settingClose}
+              menuRightPx={menuRightPx}
+            />
+          )}
+
+          {noticeVisible && (
+            <MessageNotice
+              isDarkMode={isDarkMode}
+              contentsRef={parent.current as HTMLDivElement}
+              settingClose={settingClose}
+              menuRightPx={menuRightPx}
             />
           )}
         </Contents>

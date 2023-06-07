@@ -145,7 +145,7 @@ const ActiveUser = ({
           <span style={{ color: isDarkMode ? '#EDECEB' : '#000', fontSize: Math.floor(fontRatio / 5) }}>
             <strong>월별 활성 유저</strong>
           </span>
-          <span style={{ color: isDarkMode ? 'lightgray' : 'gray', fontSize: Math.floor(fontRatio / 5.5) }}>
+          <span style={{ color: isDarkMode ? '#6F6E6D' : 'gray', fontSize: Math.floor(fontRatio / 5.5) }}>
             Monthly Active User
           </span>
           <span style={{ fontSize: Math.floor(fontRatio / 1.5), marginBottom: '10px' }}>

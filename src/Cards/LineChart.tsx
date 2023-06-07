@@ -147,7 +147,7 @@ const LineChart = ({
       <CardTitle>
         <span style={{ color: isDarkMode ? '#EDECEB' : '#000' }}>최근 20일 간 일자별 애플리케이션별 접속 수</span>
         <div>
-          <span style={{ color: isDarkMode ? 'lightgray' : 'gray', fontSize: '12px', fontWeight: 'normal' }}>
+          <span style={{ color: isDarkMode ? '#6F6E6D' : 'gray', fontSize: '12px', fontWeight: 'normal' }}>
             Number of connections by application in the last 20 days
           </span>
         </div>
