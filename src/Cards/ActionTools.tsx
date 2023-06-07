@@ -208,11 +208,7 @@ const ActionTools = ({ name, handleDelete, handleSelectCard, handleContext }: My
             currentRatio={currentRatio}
           />
         )}
-        {name.includes('Server Time') && (
-          <IconButton className={name} style={{ padding: 0, color: '#1976d2' }}>
-            <SettingsIcon fontSize="small" />
-          </IconButton>
-        )}
+
         <IconButton className={name} style={{ padding: 0, color: '#a52121' }} onClick={handleDeleteClick}>
           <DeleteForeverIcon fontSize="small" />
         </IconButton>

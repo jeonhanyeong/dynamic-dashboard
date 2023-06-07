@@ -8,23 +8,16 @@ const Setting = styled.div`
   background-color: ${(props) => props.theme.bgColor};
   color: ${(props) => props.theme.textColor};
   padding: 10px;
-  width: 15%;
-  height: 30%;
+  width: 220px;
+  height: 160px;
   position: absolute;
   border-bottom: 1px solid;
   border-left: 1px solid;
   border-right: 1px solid;
   border-color: ${(props) => props.theme.borderColor};
+  box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.132), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.108);
   padding: 0;
   z-index: 1000;
-`;
-
-const SettingHeader = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-left: 10px;
-  padding: 0 10px;
 `;
 
 const SettingBody = styled.div`
@@ -44,6 +37,7 @@ const SettingLabel = styled.div`
   color: ${(props) => props.theme.textColor};
   margin-top: 10px;
   padding: 0;
+  font-weight: bolder;
 `;
 
 const ModeChange = styled.div`
@@ -116,18 +110,15 @@ const ModeSetting = ({ contentsRef, handleModeChange, settingClose, menuRightPx 
 
   return (
     <Setting ref={settingRef} style={{ right: menuRightPx }}>
-      <SettingHeader>
-        <h1>설정</h1>
-      </SettingHeader>
       <SettingBody>
-        <SettingLabel>테마 변경</SettingLabel>
+        <SettingLabel>Theme Change</SettingLabel>
         <ModeChange>
           <Mode onClick={handleChangeLight} style={{ boxShadow: isLightClicked ? '0 0 0 1px #bcbcbc' : 'none' }}>
-            <img src={`${lightMode}`} width="80px" height="80px" alt="라이트모드" loading="lazy" />
+            <img src={`${lightMode}`} width="70px" height="70px" alt="라이트모드" loading="lazy" />
             <span style={{ marginTop: '5px' }}>밝게</span>
           </Mode>
           <Mode onClick={handleChangeDark} style={{ boxShadow: isDarkClicked ? '0 0 0 1px #bcbcbc' : 'none' }}>
-            <img src={`${darkMode}`} width="80px" height="80px" alt="다크모드" loading="lazy" />
+            <img src={`${darkMode}`} width="70px" height="70px" alt="다크모드" loading="lazy" />
             <span style={{ marginTop: '5px' }}>어둡게</span>
           </Mode>
         </ModeChange>

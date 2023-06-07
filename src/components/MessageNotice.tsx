@@ -14,6 +14,8 @@ const Setting = styled.div`
   border-left: 1px solid;
   border-right: 1px solid;
   border-color: ${(props) => props.theme.borderColor};
+  box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.132), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.108);
+  // box-shadow: ${(props) => `0 1.6px 3.6px 0 ${props.theme.borderColor}, 0 0.3px 0.9px 0 ${props.theme.borderColor}`};
   padding: 0;
   z-index: 1000;
 `;
@@ -51,6 +53,7 @@ const Message = styled.li`
   box-sizing: border-box;
   background-color: ${(props) => props.theme.bgColor};
   color: ${(props) => props.theme.textColor};
+  border-bottom: 1px solid ${(props) => props.theme.hoverColor};
   &:hover {
     background-color: ${(props) => props.theme.hoverColor};
   }
@@ -83,6 +86,7 @@ const MessageDelete = styled.div`
   font-size: 10px;
   color: #000;
   text-decoration: underline;
+  text-decoration-color: ${(props) => props.theme.textColor};
   vertical-align: bottom;
   justify-content: end;
   background-color: ${(props) => props.theme.bgColor};
@@ -194,7 +198,12 @@ const MessageNotice = ({ isDarkMode, contentsRef, settingClose, menuRightPx }: n
           role="presentation"
           onClick={handleAllMessageDelete}
           onKeyDown={handleKeyDown}
-          style={{ cursor: 'pointer', marginRight: '10px', marginTop: '18px', height: '15px' }}
+          style={{
+            cursor: 'pointer',
+            marginRight: '10px',
+            marginTop: '18px',
+            height: '15px',
+          }}
         >
           전송 내역 비우기
         </span>

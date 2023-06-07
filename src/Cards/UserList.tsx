@@ -177,7 +177,6 @@ const UserList = ({
 
   const onSelectionChanged = ({ selectedRowsData }: any) => {
     const data = selectedRowsData[0];
-    console.log(data);
     setShowEmployeeInfo(!!data);
     setSelectedRowEmail(data.email);
     setSelectedRowName({
@@ -189,7 +188,6 @@ const UserList = ({
   const handleRefreshClick = () => {
     if (datagridRef.current) {
       datagridRef.current.instance.refresh();
-      console.log('새로고침');
     }
   };
 
@@ -268,6 +266,7 @@ const UserList = ({
       content: textArea.value,
       sendDate: saved,
     };
+
     addToLocalStorage('messageLog', messageData);
   };
 

@@ -3,8 +3,9 @@ import Toolbar from '@mui/material/Toolbar';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
+import CircleIcon from '@mui/icons-material/Circle';
 import styled from 'styled-components';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRaf } from 'react-use';
 
 type MyComponentProps = {
@@ -16,12 +17,14 @@ type MyComponentProps = {
 };
 
 const NavMenu = styled.div`
+  position: relative;
   display: flex;
   background-color: none;
   height: 40px;
   align-items: center;
   padding: 0px 10px;
   color: #edeceb;
+  justify-content: center;
 
   &:hover {
     background-color: ${(props) => props.theme.navHoverColor};
@@ -38,8 +41,10 @@ const TopNavBar = ({
 }: MyComponentProps) => {
   const noticeRef = useRef<HTMLDivElement>(null);
   const settingRef = useRef<HTMLDivElement>(null);
+  const [isClicked, setIsClicked] = useState(false);
 
   const openMessageNotice = () => {
+    setIsClicked(false);
     const noticeComponent = noticeRef.current;
     const screenWidth = window.innerWidth;
     if (noticeComponent) {
@@ -78,6 +83,38 @@ const TopNavBar = ({
     color: isDarkMode ? '#EDECEB' : '#fff',
   };
 
+  /*
+  useEffect(() => {
+    const handleStorageChange = (event: any) => {
+      if (event.key === 'messageLog') {
+        // 이전에 저장된 배열
+        const data = localStorage.getItem('messageLog');
+        if (data) {
+          console.log('이게되냐?');
+          const previousData = JSON.parse(data) || [];
+          // 현재 저장된 배열
+          const currentData = JSON.parse(event.newValue || '') || [];
+
+          // 데이터 추가 여부 확인
+          if (currentData.length > previousData.length) {
+            console.log('messageLog 배열에 데이터가 추가되었습니다.');
+            setIsClicked(true);
+          } else {
+            console.log('엘시문');
+          }
+        }
+      }
+    };
+
+    // 이벤트 핸들러 등록
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [localStorage.getItem('messageLog')]);
+*/
+
   return (
     <AppBar position="static" style={appbarStyle}>
       <Toolbar style={toolbarStlye}>
@@ -93,6 +130,18 @@ const TopNavBar = ({
           }}
         >
           <NotificationsNoneOutlinedIcon fontSize="small" />
+          {isClicked ? (
+            <CircleIcon
+              style={{
+                position: 'absolute',
+                top: '60%',
+                left: '60%',
+                transform: 'translate(-40%, -40%)',
+                fontSize: '8px',
+                color: 'red',
+              }}
+            />
+          ) : null}
         </NavMenu>
         <NavMenu
           ref={settingRef}
