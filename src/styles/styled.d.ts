@@ -10,5 +10,6 @@ declare module 'styled-components' {
     borderColor: string;
     navHoverColor: string;
     scrollColor: string;
+    backImage: string;
   }
 }

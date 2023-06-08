@@ -3,6 +3,8 @@ import React, { useState, useEffect, useRef, HTMLAttributes } from 'react';
 import Button from '@mui/material//Button';
 import AddIcon from '@mui/icons-material/Add';
 import TextField from '@mui/material/TextField';
+import Switch from '@mui/material/Switch';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import LineChart from '../Cards/LineChart';
 import BarChart from '../Cards/BarChart';
 import MonthlyActiveUser from '../Cards/MonthlyActiveUser';
@@ -56,7 +58,7 @@ interface LocalStorageType {
 const DarkModeDashboardSize = styled.div`
   top: 0px;
   left: 0px;
-
+  z-index: 1;
   position: absolute;
   box-sizing: border-box;
   opacity: 0.7;
@@ -66,6 +68,8 @@ const DarkModeDashboardSize = styled.div`
   pointer-events: none;
   line-height: normal;
   background-color: none;
+  color: ${(props) => props.theme.textColor};
+  border-color: ${(props) => props.theme.textColor};
   font-size: 13px;
   font-weight: inherit;
 `;
@@ -111,7 +115,8 @@ const EditDashboard = styled.div`
 const TileGrid = styled.div<TileGridProps>`
   display: block;
   // background-image: url(https://portal.azure.com/Content/Static//MsPortalImpl/General/FlowLayout_gridShadow.png);
-  background-image: ${(props) => (props.backgroundImage ? `url(${props.backgroundImage})` : 'none')};
+  // background-image: ${(props) => (props.backgroundImage ? `url(${props.backgroundImage})` : 'none')};
+  background-image: ${(props) => props.theme.backImage};
   background-attachment: scroll;
   width: 3865px;
   height: 2155px;
@@ -125,8 +130,9 @@ const TileGrid = styled.div<TileGridProps>`
   background-position-x: 0%;
   background-position-y: 0%;
   background-size: auto;
-  // background-color: ${(props) => props.theme.bgColor};
+  // background-color: #252423 !important;
   color: ${(props) => props.theme.textColor};
+  z-index: 0;
 `;
 
 const ResizePlaceHolder = styled.div`
@@ -238,11 +244,16 @@ const EditDashboardBody = ({
     left: 0,
     display: 'none',
   });
+  const [resolutionGrid, setResolutionGrid] = useState(false);
 
   const btnStyle = {
     marginRight: '10px',
     color: isDarkMode ? '#EDECEB' : '#1976d2',
     borderColor: isDarkMode ? '#EDECEB' : '#1976d2',
+  };
+
+  const handleShowResolutionGrid = () => {
+    setResolutionGrid(!resolutionGrid);
   };
 
   const galleryOpen = () => {
@@ -829,7 +840,6 @@ const EditDashboardBody = ({
               {dashboardTitle}
             </div>
           )}
-
           <Button
             style={{ marginRight: '10px', color: '#EDECEB' }}
             variant="contained"
@@ -857,6 +867,12 @@ const EditDashboardBody = ({
               갤러리 열기
             </Button>
           )}
+          <Switch onChange={handleShowResolutionGrid} />{' '}
+          <span
+            style={{ display: 'flex', alignItems: 'center', color: isDarkMode ? '#EDECEB' : '#000', fontSize: '14px' }}
+          >
+            해상도 그리드 표시
+          </span>
         </div>
       </ContentTop>
       <Explain>
@@ -867,7 +883,7 @@ const EditDashboardBody = ({
         )}
       </Explain>
       <EditDashboard>
-        {isDarkMode && clickPreview ? (
+        {resolutionGrid && clickPreview ? (
           <>
             <DarkModeDashboardSize style={{ width: '1024px', height: '768px' }}>
               <span style={{ position: 'absolute', bottom: '5px', right: '5px' }}>1024 x 768</span>
@@ -910,7 +926,7 @@ const EditDashboardBody = ({
               style={{
                 width: placeholderPosition.positionWidth,
                 height: placeholderPosition.positionHeight,
-                backgroundColor: isDarkMode ? '#000' : 'rgba(0,0,0,0.125)',
+                backgroundColor: isDarkMode ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.125)',
                 boxSizing: 'border-box',
                 position: 'absolute',
                 border: '1px solid ',

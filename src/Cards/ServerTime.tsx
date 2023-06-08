@@ -90,14 +90,16 @@ const ServerTime = ({
     setTimer(updateCurrentTime);
   };
 
-  const startTimer = () => {
-    setInterval(currentTimer, 1000);
-  };
-  startTimer();
-
   useEffect(() => {
     setFontRatio(Math.floor(widthPx / 6));
   }, [widthPx]);
+
+  useEffect(() => {
+    const serverTime = setInterval(currentTimer, 1000);
+    return () => {
+      clearInterval(serverTime);
+    };
+  }, []);
   return (
     <CardBoard
       ref={cardBoardRef}

@@ -136,7 +136,7 @@ const LastUpdate = styled.div`
   right: 80px;
   top: 45px;
   position: absolute;
-  background-color: ${(props) => props.theme.bgColor};
+  background-color: 'none';
   color: ${(props) => props.theme.textColor};
 `;
 
