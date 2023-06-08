@@ -32,6 +32,8 @@ interface MyComponentProps {
   apiInfo: apiInfoInterface;
   handleOpenEditDashboard: (editTarget: string | null) => void;
   isDarkMode: boolean;
+  handleTileSettingVisible: () => void;
+  handleShowNoticeAlarm: () => void;
 }
 
 interface LocalStorageType {
@@ -173,7 +175,13 @@ const TileGrid = styled.div`
   background-size: auto;
 `;
 
-const DashboardBody = ({ apiInfo, handleOpenEditDashboard, isDarkMode }: MyComponentProps) => {
+const DashboardBody = ({
+  apiInfo,
+  handleOpenEditDashboard,
+  isDarkMode,
+  handleTileSettingVisible,
+  handleShowNoticeAlarm,
+}: MyComponentProps) => {
   const [isSaving, setIsSaving] = useState(true);
   const [clickedDashboardList, setClickedDashboardList] = useState(false);
   const [parsedData, setParsedData] = useState<LocalStorageType[]>([]);
@@ -329,6 +337,7 @@ const DashboardBody = ({ apiInfo, handleOpenEditDashboard, isDarkMode }: MyCompo
                       handleContext={null}
                       apiInfo={apiInfo}
                       isDarkMode={isDarkMode}
+                      handleTileSettingVisible={handleTileSettingVisible}
                     />
                   );
                 }
@@ -347,6 +356,8 @@ const DashboardBody = ({ apiInfo, handleOpenEditDashboard, isDarkMode }: MyCompo
                       handleContext={null}
                       apiInfo={apiInfo}
                       isDarkMode={isDarkMode}
+                      handleTileSettingVisible={handleTileSettingVisible}
+                      handleShowNoticeAlarm={handleShowNoticeAlarm}
                     />
                   );
                 }
@@ -364,6 +375,7 @@ const DashboardBody = ({ apiInfo, handleOpenEditDashboard, isDarkMode }: MyCompo
                       handleDelete={null}
                       handleContext={null}
                       isDarkMode={isDarkMode}
+                      handleTileSettingVisible={handleTileSettingVisible}
                     />
                   );
                 }
@@ -382,6 +394,7 @@ const DashboardBody = ({ apiInfo, handleOpenEditDashboard, isDarkMode }: MyCompo
                       handleContext={null}
                       apiInfo={apiInfo}
                       isDarkMode={isDarkMode}
+                      handleTileSettingVisible={handleTileSettingVisible}
                     />
                   );
                 }
@@ -401,6 +414,7 @@ const DashboardBody = ({ apiInfo, handleOpenEditDashboard, isDarkMode }: MyCompo
                       handleContext={null}
                       apiInfo={apiInfo}
                       isDarkMode={isDarkMode}
+                      handleTileSettingVisible={handleTileSettingVisible}
                     />
                   );
                 }
@@ -419,6 +433,7 @@ const DashboardBody = ({ apiInfo, handleOpenEditDashboard, isDarkMode }: MyCompo
                       handleContext={null}
                       apiInfo={apiInfo}
                       isDarkMode={isDarkMode}
+                      handleTileSettingVisible={handleTileSettingVisible}
                     />
                   );
                 }

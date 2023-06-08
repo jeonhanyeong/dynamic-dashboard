@@ -40,6 +40,7 @@ interface CardPosition {
   handleDelete: ((event: React.MouseEvent) => void) | null;
   handleContext: ((name: string, ratioWidth: number, ratioHeight: number) => void) | null;
   apiInfo: apiInfoInterface;
+  handleTileSettingVisible: () => void;
   isDarkMode: boolean;
 }
 
@@ -55,6 +56,7 @@ const ActiveUser = ({
   handleContext,
   apiInfo,
   isDarkMode,
+  handleTileSettingVisible,
 }: CardPosition) => {
   const credentials = encode(`${apiInfo.username}:${apiInfo.password}`);
   const basicAuth = `Basic ${credentials}`;
@@ -124,6 +126,7 @@ const ActiveUser = ({
           handleDelete={handleDelete}
           handleSelectCard={handleSelectCard}
           handleContext={handleContext}
+          handleTileSettingVisible={handleTileSettingVisible}
         />
       )}
       <div

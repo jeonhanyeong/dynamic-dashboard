@@ -62,6 +62,7 @@ interface CardPosition {
   handleContext: ((name: string, ratioWidth: number, ratioHeight: number) => void) | null;
   apiInfo: apiInfoInterface;
   isDarkMode: boolean;
+  handleTileSettingVisible: () => void;
 }
 
 const LineChart = ({
@@ -75,6 +76,7 @@ const LineChart = ({
   isPreview,
   handleDelete,
   handleContext,
+  handleTileSettingVisible,
   apiInfo,
 }: CardPosition) => {
   const credentials = encode(`${apiInfo.username}:${apiInfo.password}`);
@@ -141,6 +143,7 @@ const LineChart = ({
           handleDelete={handleDelete}
           handleSelectCard={handleSelectCard}
           handleContext={handleContext}
+          handleTileSettingVisible={handleTileSettingVisible}
         />
       )}
 

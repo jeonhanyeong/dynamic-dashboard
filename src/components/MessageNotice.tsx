@@ -7,7 +7,7 @@ const Setting = styled.div`
   background-color: ${(props) => props.theme.bgColor};
   color: ${(props) => props.theme.textColor};
   padding: 10px;
-  width: 12%;
+  width: 13%;
   height: 40%;
   position: absolute;
   border-bottom: 1px solid;

@@ -49,6 +49,7 @@ interface CardPosition {
   handleContext: ((name: string, ratioWidth: number, ratioHeight: number) => void) | null;
   apiInfo: apiInfoInterface;
   isDarkMode: boolean;
+  handleTileSettingVisible: () => void;
 }
 
 interface dataInterface {
@@ -70,6 +71,7 @@ const BarChart = ({
   isPreview,
   handleDelete,
   handleContext,
+  handleTileSettingVisible,
   apiInfo,
   isDarkMode,
 }: CardPosition) => {
@@ -185,6 +187,7 @@ const BarChart = ({
           handleDelete={handleDelete}
           handleSelectCard={handleSelectCard}
           handleContext={handleContext}
+          handleTileSettingVisible={handleTileSettingVisible}
         />
       )}
       <CardTitle>

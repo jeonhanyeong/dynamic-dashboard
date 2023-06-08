@@ -76,6 +76,8 @@ interface CardPosition {
   handleContext: ((name: string, ratioWidth: number, ratioHeight: number) => void) | null;
   apiInfo: apiInfoInterface;
   isDarkMode: boolean;
+  handleTileSettingVisible: () => void;
+  handleShowNoticeAlarm: () => void;
 }
 
 interface NameInterface {
@@ -104,6 +106,8 @@ const UserList = ({
   isPreview,
   handleDelete,
   handleContext,
+  handleTileSettingVisible,
+  handleShowNoticeAlarm,
   apiInfo,
   isDarkMode,
 }: CardPosition) => {
@@ -241,6 +245,7 @@ const UserList = ({
           type: 'success',
           message: '메시지가 전송되었습니다.',
         }));
+        handleShowNoticeAlarm();
 
         setTimeout(
           () =>
@@ -296,6 +301,7 @@ const UserList = ({
           handleDelete={handleDelete}
           handleSelectCard={handleSelectCard}
           handleContext={handleContext}
+          handleTileSettingVisible={handleTileSettingVisible}
         />
       )}
 

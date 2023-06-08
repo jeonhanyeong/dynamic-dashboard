@@ -10,6 +10,7 @@ import EditDashboardBody from './components/EditDashboardBody';
 import DashboardBody from './components/DashboardBody';
 import ModeSetting from './components/ModeSetting';
 import MessageNotice from './components/MessageNotice';
+import TileSetting from './components/TileSetting';
 
 const GlobalStyle = createGlobalStyle`
   ${reset}  
@@ -108,6 +109,8 @@ const App = () => {
   const [galleryVisible, setGalleryVisible] = useState(false);
   const [noticeVisible, setNoticeVisible] = useState(false);
   const [settingVisible, setSettingVisible] = useState(false);
+  const [tileSettingVisible, setTileSettingVisible] = useState(false);
+  const [noticeAlarm, setNoticeAlarm] = useState(false);
   const [tileTypes, setTileTypes] = useState<TileInfo[]>([
     {
       title: 'Active Users',
@@ -144,6 +147,13 @@ const App = () => {
   });
   const [menuRightPx, setMenuRightPx] = useState<number>(0);
 
+  const handleHideNoticeAlarm = () => {
+    setNoticeAlarm(false);
+  };
+  const handleShowNoticeAlarm = () => {
+    setNoticeAlarm(true);
+  };
+
   const handleModeChange = (changeMode: boolean) => {
     setIsDarkMode(changeMode);
     localStorage.setItem('mode', JSON.stringify(changeMode));
@@ -169,6 +179,7 @@ const App = () => {
 
   const handleGalleryVisible = () => {
     setGalleryVisible(!galleryVisible); // 부모 컴포넌트의 상태를 변경
+    setTileSettingVisible(false);
   };
 
   const handleSettingVisible = (right: number) => {
@@ -182,12 +193,21 @@ const App = () => {
     setSettingVisible(false);
   };
 
+  const handleTileSettingVisible = () => {
+    setGalleryVisible(false);
+    setTileSettingVisible(!tileSettingVisible);
+  };
+
   const handleDragStart = (event: DragEvent) => {
     // console.log(e.target.className);
     const eventTarget = event.target as HTMLDivElement;
     setDragTarget(eventTarget);
     const foundTile = tileTypes.find((tileInfo) => eventTarget.className.includes(tileInfo.title));
     setDragTargetType(foundTile?.title);
+  };
+
+  const handleDragEnd = () => {
+    setDragTarget(null);
   };
 
   const handleAddComponentByClick = (sel: TileInfo) => {
@@ -295,6 +315,8 @@ const App = () => {
           settingVisible={settingVisible}
           noticeVisible={noticeVisible}
           isDarkMode={isDarkMode}
+          noticeAlarm={noticeAlarm}
+          handleHideNoticeAlarm={handleHideNoticeAlarm}
         />
         <Contents ref={parent} className={isDarkMode ? 'viewport dx-theme-dark' : 'viewport dx-theme-light'}>
           {isEditDashboard ? null : (
@@ -302,6 +324,8 @@ const App = () => {
               <DashboardBody
                 apiInfo={apiInfo}
                 handleOpenEditDashboard={handleOpenEditDashboard}
+                handleTileSettingVisible={handleTileSettingVisible}
+                handleShowNoticeAlarm={handleShowNoticeAlarm}
                 isDarkMode={isDarkMode}
               />
             </Dashboard>
@@ -313,6 +337,7 @@ const App = () => {
                 isDarkMode={isDarkMode}
                 apiInfo={apiInfo}
                 dragTarget={dragTarget}
+                handleDragEnd={handleDragEnd}
                 dragTargetType={dragTargetType}
                 selectedTileType={selectedTileType}
                 editTarget={isEditTarget}
@@ -321,6 +346,8 @@ const App = () => {
                 handleSaveDashboard={handleSaveDashboard}
                 handleEditSaveDashboard={handleEditSaveDashboard}
                 handleIsPreview={handleIsPreview}
+                handleTileSettingVisible={handleTileSettingVisible}
+                handleShowNoticeAlarm={handleShowNoticeAlarm}
               />
             </Dashboard>
           )}
@@ -348,6 +375,10 @@ const App = () => {
               settingClose={settingClose}
               menuRightPx={menuRightPx}
             />
+          )}
+
+          {tileSettingVisible && (
+            <TileSetting isDarkMode={isDarkMode} handleTileSettingVisible={handleTileSettingVisible} />
           )}
         </Contents>
       </WebContainer>

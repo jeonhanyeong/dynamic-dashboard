@@ -40,6 +40,7 @@ interface CardPosition {
   handleContext: ((name: string, ratioWidth: number, ratioHeight: number) => void) | null;
   apiInfo: apiInfoInterface;
   isDarkMode: boolean;
+  handleTileSettingVisible: () => void;
 }
 
 const ActiveUser = ({
@@ -52,6 +53,7 @@ const ActiveUser = ({
   isPreview,
   handleDelete,
   handleContext,
+  handleTileSettingVisible,
   apiInfo,
   isDarkMode,
 }: CardPosition) => {
@@ -125,6 +127,7 @@ const ActiveUser = ({
           handleDelete={handleDelete}
           handleSelectCard={handleSelectCard}
           handleContext={handleContext}
+          handleTileSettingVisible={handleTileSettingVisible}
         />
       )}
 

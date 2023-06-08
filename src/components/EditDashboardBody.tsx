@@ -40,6 +40,9 @@ interface MyComponentProps extends HTMLAttributes<HTMLDivElement> {
   handleSaveDashboard: (title: string, components: ComponentPosition[]) => void;
   handleEditSaveDashboard: (editTarget: string, title: string, components: ComponentPosition[]) => void;
   handleIsPreview: () => void;
+  handleDragEnd: () => void;
+  handleTileSettingVisible: () => void;
+  handleShowNoticeAlarm: () => void;
 }
 
 interface TileGridProps {
@@ -178,6 +181,7 @@ interface PositionInterface {
   positionLeft: number;
   positionWidth: number;
   positionHeight: number;
+  zIndex: number;
 }
 
 const EditDashboardBody = ({
@@ -192,6 +196,9 @@ const EditDashboardBody = ({
   handleSaveDashboard,
   handleEditSaveDashboard,
   handleIsPreview,
+  handleDragEnd,
+  handleTileSettingVisible,
+  handleShowNoticeAlarm,
 }: MyComponentProps) => {
   let draggingTop = 0;
   let draggingLeft = 0;
@@ -205,8 +212,6 @@ const EditDashboardBody = ({
   const resizeCardRef = useRef<HTMLDivElement>(null);
   const previewDashboardTitleRef = useRef<HTMLDivElement>(null);
 
-  const [autoMovingClickedElement, setAutoMovingClickedElement] = useState<HTMLDivElement | null | undefined>();
-
   const [isEditingMode, setIsEditingMode] = useState(false);
   const [clickPreview, setClickPreview] = useState(true);
   const [dashboardTitle, setDashboardTitle] = useState('제목 없음');
@@ -216,6 +221,7 @@ const EditDashboardBody = ({
     positionLeft: 0,
     positionWidth: 445,
     positionHeight: 267,
+    zIndex: 900,
   });
   const [dragging, setDragging] = useState(false);
   const [resizingComponents, setResizingComponents] = useState<resizePosition>({
@@ -270,7 +276,6 @@ const EditDashboardBody = ({
   };
 
   const handleEditSaveClick = () => {
-    // console.log(editTarget);
     if (editTarget !== null) {
       handleEditSaveDashboard(editTarget, dashboardTitle, componentPositions);
     }
@@ -287,15 +292,18 @@ const EditDashboardBody = ({
   // 맥시멈(일단 처음에 보여지는 화면 크기(타일갤러리 제외)) = left: 900, top: 360
   // 수정1) 현재는 placeholder의 위치에 대해서만 컴포넌트의 위치가 변경이 됌
   // 수정2_Todo) placeholder의 위치와 다른 컴포넌트의 위치도 감지해서 안겹치게 이동해야됌(최종)
-  const autoArrangeElements = (elements: ComponentPosition[], placeholder: PositionInterface) => {
-    setComponentPositions(AutoMoving(elements, placeholder, autoMovingClickedElement));
-    ResizeAutoMoving();
+  const autoArrangeElements = (elements: ComponentPosition[], placeholder: PositionInterface, dragElement: any) => {
+    // 처음에 우선적으로 여기서 placeholder랑 겹치는지 검사 후
+    // 사용자가 놓는 위치랑은 안겹치게 컴포넌트들을 이동 시킴
+    const resultComponents = AutoMoving(elements, placeholder, dragElement);
+    console.log(placeholder);
+    setComponentPositions(resultComponents);
   };
 
   // 타일을 대시보드로 끌어올 때
   const handleTileDragOver = (event: DragEvent) => {
     event.preventDefault();
-    setAutoMovingClickedElement(dragTarget);
+    // setAutoMovingClickedElement(dragTarget);
     const { clientX, clientY } = event; // 마우스의 현재 위치 가져오기
     const tileGrid = event.currentTarget as HTMLDivElement;
     const tileGridRect = tileGrid.getBoundingClientRect();
@@ -329,6 +337,7 @@ const EditDashboardBody = ({
       positionLeft: draggingLeft,
       positionHeight: heightOfType,
       positionWidth: WidthOfType,
+      zIndex: 5000,
     }));
 
     setDragging(true);
@@ -338,6 +347,16 @@ const EditDashboardBody = ({
   const handleTileDrop = (event: DragEvent) => {
     // event.preventDefault();
     setDragging(false);
+    handleDragEnd();
+    const newPlaceholderPosition = {
+      positionTop: draggingTop,
+      positionLeft: draggingLeft,
+      positionWidth: WidthOfType,
+      positionHeight: heightOfType,
+      zIndex: 1000,
+    };
+
+    autoArrangeElements(componentPositions, newPlaceholderPosition, dragTarget);
 
     setComponentPositions((prevComponentPositions) => [
       ...prevComponentPositions,
@@ -350,8 +369,6 @@ const EditDashboardBody = ({
         display: 'block',
       },
     ]);
-    // console.log(draggingTop);
-    // console.log(draggingLeft);
   };
 
   // 타일이 대시보드 밖으로 나갈 때
@@ -365,11 +382,17 @@ const EditDashboardBody = ({
 
   // 타일 안에 있는 카드 드래그해서 이동시키기
   const handleMouseDown = (event: React.MouseEvent) => {
+    const newPlaceholderPosition = {
+      positionTop: 0,
+      positionLeft: 0,
+      positionWidth: 0,
+      positionHeight: 0,
+      zIndex: 999,
+    };
     const target = event.target as HTMLElement;
 
     const cardInDashboard = target.parentElement as HTMLDivElement;
 
-    setAutoMovingClickedElement(cardInDashboard);
     const initialTop = parseInt(cardInDashboard.style.top, 10);
     const initialLeft = parseInt(cardInDashboard.style.left, 10);
     const initialWidth = parseInt(cardInDashboard.style.width, 10);
@@ -378,16 +401,13 @@ const EditDashboardBody = ({
     if (target.classList.contains('Card-Cover')) {
       setDragging(true);
 
-      const to = initialTop;
-      const le = initialLeft;
-      const ar = componentPositions;
-
       setPlaceholderPosition((prevDragPosition) => ({
         ...prevDragPosition,
         positionTop: initialTop,
         positionLeft: initialLeft,
         positionWidth: initialWidth,
         positionHeight: initialHeight,
+        zIndex: 999, // 드래그 되는 요소와 나머지 요소의 중간값
       }));
 
       // 드래그오버
@@ -407,9 +427,10 @@ const EditDashboardBody = ({
           positionHeight: initialHeight,
         }));
 
-        if (finalTop === to && finalLeft === le) {
-          setComponentPositions(ar);
-        }
+        newPlaceholderPosition.positionTop = finalTop > 0 ? finalTop : 0;
+        newPlaceholderPosition.positionLeft = finalLeft > 0 ? finalLeft : 0;
+        newPlaceholderPosition.positionWidth = initialWidth;
+        newPlaceholderPosition.positionHeight = initialHeight;
       };
 
       // 드래그리브
@@ -420,21 +441,20 @@ const EditDashboardBody = ({
       const handleCardDrop = (upEvent: DragEvent) => {
         setDragging(false);
         cardInDashboard.style.opacity = '1';
-        setComponentPositions((prevComponentPositions) => {
-          const update = prevComponentPositions.map((com) => {
-            if (cardInDashboard.className.includes(com.id)) {
-              return {
-                ...com,
-                top: com.top + draggingTop > 0 ? com.top + draggingTop : 0,
-                left: com.left + draggingLeft > 0 ? com.left + draggingLeft : 0,
-              };
-            }
-            return com;
-          });
 
-          return update;
+        const update = componentPositions.map((com) => {
+          if (cardInDashboard.className.includes(com.id)) {
+            return {
+              ...com,
+              top: com.top + draggingTop > 0 ? newPlaceholderPosition.positionTop : 0,
+              left: com.left + draggingLeft > 0 ? newPlaceholderPosition.positionLeft : 0,
+            };
+          }
+          return com;
         });
-        // setComponentPositions(updatedComponentPositions);
+        setComponentPositions(update);
+        autoArrangeElements(update, newPlaceholderPosition, cardInDashboard);
+
         document.removeEventListener('dragover', handleCardDragOver);
         document.removeEventListener('dragleave', handleCardDragLeave);
         document.removeEventListener('drop', handleCardDrop);
@@ -442,7 +462,6 @@ const EditDashboardBody = ({
 
       const mup = () => {
         setDragging(false);
-        setAutoMovingClickedElement(null);
         document.removeEventListener('dragover', handleCardDragOver);
         document.removeEventListener('dragleave', handleCardDragLeave);
         document.removeEventListener('drop', handleCardDrop);
@@ -458,8 +477,6 @@ const EditDashboardBody = ({
     // 리사이즈 핸들일때
     else if (target.classList.contains('resizeHandle')) {
       setDragging(true);
-      console.log(initialWidth);
-      console.log(initialHeight);
       const downEventClientX = event.clientX;
       const downEventClientY = event.clientY;
 
@@ -508,25 +525,29 @@ const EditDashboardBody = ({
           positionWidth: Math.ceil(finalResizeWidth / 90) * 90 - 5,
           positionHeight: Math.ceil(finalResizeHeight / 90) * 90 - 5,
         }));
+        newPlaceholderPosition.positionTop = initialTop;
+        newPlaceholderPosition.positionLeft = initialLeft;
+        newPlaceholderPosition.positionWidth = Math.ceil(finalResizeWidth / 90) * 90 - 5;
+        newPlaceholderPosition.positionHeight = Math.ceil(finalResizeHeight / 90) * 90 - 5;
       };
 
       const resizeMouseUp = () => {
         setDragging(false);
-        setComponentPositions((prevComponentPositions) => {
-          const update = prevComponentPositions.map((com) => {
-            if (cardInDashboard.className.includes(com.id)) {
-              return {
-                ...com,
-                width: Math.ceil(finalResizeWidth / 90) * 90 - 5,
-                height: Math.ceil(finalResizeHeight / 90) * 90 - 5,
-                display: 'block',
-              };
-            }
-            return com;
-          });
 
-          return update;
+        const update = componentPositions.map((com) => {
+          if (cardInDashboard.className.includes(com.id)) {
+            return {
+              ...com,
+              width: newPlaceholderPosition.positionWidth,
+              height: newPlaceholderPosition.positionHeight,
+              display: 'block',
+            };
+          }
+          return com;
         });
+        setComponentPositions(update);
+        autoArrangeElements(update, newPlaceholderPosition, cardInDashboard);
+
         setResizingComponents((prevSize) => ({
           ...prevSize,
           display: 'none',
@@ -587,6 +608,7 @@ const EditDashboardBody = ({
           isPreview={!clickPreview}
           handleDelete={handleDeleteComponent}
           handleContext={handleResizeContext}
+          handleTileSettingVisible={handleTileSettingVisible}
           apiInfo={apiInfo}
           isDarkMode={isDarkMode}
         />
@@ -605,6 +627,7 @@ const EditDashboardBody = ({
           isPreview={!clickPreview}
           handleDelete={handleDeleteComponent}
           handleContext={handleResizeContext}
+          handleTileSettingVisible={handleTileSettingVisible}
           apiInfo={apiInfo}
           isDarkMode={isDarkMode}
         />
@@ -623,8 +646,10 @@ const EditDashboardBody = ({
           isPreview={!clickPreview}
           handleDelete={handleDeleteComponent}
           handleContext={handleResizeContext}
+          handleTileSettingVisible={handleTileSettingVisible}
           apiInfo={apiInfo}
           isDarkMode={isDarkMode}
+          handleShowNoticeAlarm={handleShowNoticeAlarm}
         />
       );
     }
@@ -641,6 +666,7 @@ const EditDashboardBody = ({
           isPreview={!clickPreview}
           handleDelete={handleDeleteComponent}
           handleContext={handleResizeContext}
+          handleTileSettingVisible={handleTileSettingVisible}
           isDarkMode={isDarkMode}
         />
       );
@@ -659,6 +685,7 @@ const EditDashboardBody = ({
           isPreview={!clickPreview}
           handleDelete={handleDeleteComponent}
           handleContext={handleResizeContext}
+          handleTileSettingVisible={handleTileSettingVisible}
           apiInfo={apiInfo}
           isDarkMode={isDarkMode}
         />
@@ -677,6 +704,7 @@ const EditDashboardBody = ({
           isPreview={!clickPreview}
           handleDelete={handleDeleteComponent}
           handleContext={handleResizeContext}
+          handleTileSettingVisible={handleTileSettingVisible}
           apiInfo={apiInfo}
           isDarkMode={isDarkMode}
         />
@@ -703,12 +731,13 @@ const EditDashboardBody = ({
   }, [dragTarget]);
 
   // 카드 자동 위치 조정
+  /*
   useEffect(() => {
     if (componentPositions.length > 0) {
       autoArrangeElements(componentPositions, placeholderPosition);
     }
   }, [placeholderPosition]);
-
+*/
   // 타일 갤러리에서 클릭 후 추가 버튼으로 컴포넌트 추가하기
   useEffect(() => {
     if (selectedTileType.clickedTile !== '') {
@@ -889,6 +918,7 @@ const EditDashboardBody = ({
                 boxShadow: '0 1.6px 3.6px 0 rgba(0, 0, 0, 0.132), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.108)',
                 top: placeholderPosition.positionTop,
                 left: placeholderPosition.positionLeft,
+                zIndex: placeholderPosition.zIndex,
               }}
             />
           )}

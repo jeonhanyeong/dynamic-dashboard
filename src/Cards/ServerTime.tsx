@@ -30,6 +30,7 @@ interface CardPosition {
   handleDelete: ((event: React.MouseEvent) => void) | null;
   handleContext: ((name: string, ratioWidth: number, ratioHeight: number) => void) | null;
   isDarkMode: boolean;
+  handleTileSettingVisible: () => void;
 }
 
 interface TimeInfo {
@@ -52,6 +53,7 @@ const ServerTime = ({
   isPreview,
   handleDelete,
   handleContext,
+  handleTileSettingVisible,
 }: CardPosition) => {
   const cardBoardRef = useRef<HTMLDivElement>(null);
   const [depth, setDepth] = useState(991);
@@ -118,6 +120,7 @@ const ServerTime = ({
           handleDelete={handleDelete}
           handleSelectCard={handleSelectCard}
           handleContext={handleContext}
+          handleTileSettingVisible={handleTileSettingVisible}
         />
       )}
 

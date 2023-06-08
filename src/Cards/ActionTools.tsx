@@ -69,6 +69,7 @@ interface MyComponentProps {
   handleDelete: ((event: React.MouseEvent) => void) | null;
   handleSelectCard: (dep: number) => void;
   handleContext: ((name: string, ratioWidth: number, ratioHeight: number) => void) | null;
+  handleTileSettingVisible: () => void;
 }
 interface ContextMenuPosition {
   state: boolean;
@@ -81,7 +82,13 @@ interface StlyeInterface {
   opacity: number;
 }
 
-const ActionTools = ({ name, handleDelete, handleSelectCard, handleContext }: MyComponentProps) => {
+const ActionTools = ({
+  name,
+  handleDelete,
+  handleSelectCard,
+  handleContext,
+  handleTileSettingVisible,
+}: MyComponentProps) => {
   const actionBarRef = useRef<HTMLDivElement>(null);
   const coverRef = useRef<HTMLDivElement>(null);
   const resizeHandleRef = useRef<HTMLDivElement>(null);
@@ -98,7 +105,7 @@ const ActionTools = ({ name, handleDelete, handleSelectCard, handleContext }: My
   });
 
   const handleSettingOpen = () => {
-    setIsSettingOpen(!isSettingOpen);
+    handleTileSettingVisible();
   };
 
   const handleMouseEnter = (event: MouseEvent) => {
@@ -112,7 +119,7 @@ const ActionTools = ({ name, handleDelete, handleSelectCard, handleContext }: My
   };
 
   const handleMouseLeave = (event: MouseEvent) => {
-    console.log(event.target);
+    // console.log(event.target);
     handleSelectCard(991);
     setStyleState((prev) => ({
       ...prev,
@@ -182,7 +189,6 @@ const ActionTools = ({ name, handleDelete, handleSelectCard, handleContext }: My
 
   return (
     <>
-      {isSettingOpen ? <TileSettingContents /> : null}
       <Cover
         ref={coverRef}
         className="Card-Cover"

@@ -96,8 +96,7 @@ const ContextMenu = ({
   };
 
   const settingOpen = () => {
-   //  handleSettingOpen();
-  
+    handleSettingOpen();
   };
   useEffect(() => {
     const updatedResizeClick = resizeClick.map((rc) => ({
@@ -116,10 +115,13 @@ const ContextMenu = ({
       }}
     >
       <MenuList onClick={handleResizeContext}>
-        <Elements  className={name} onClick={settingOpen}>
-          <SettingsIcon style={IconStyle} />
-          &nbsp;&nbsp; 타일 설정
-        </Elements>
+        {name.includes('Server Time') ? (
+          <Elements className={name} onClick={settingOpen}>
+            <SettingsIcon style={IconStyle} />
+            &nbsp;&nbsp; 타일 설정
+          </Elements>
+        ) : null}
+
         {resizeClick.map((re) => {
           if (re.state === false) {
             return (

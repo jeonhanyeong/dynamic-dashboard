@@ -14,6 +14,8 @@ type MyComponentProps = {
   handleNoticeVisible: (right: number) => void;
   settingVisible: boolean;
   noticeVisible: boolean;
+  noticeAlarm: boolean;
+  handleHideNoticeAlarm: () => void;
 };
 
 const NavMenu = styled.div`
@@ -38,12 +40,15 @@ const TopNavBar = ({
   handleNoticeVisible,
   settingVisible,
   noticeVisible,
+  noticeAlarm,
+  handleHideNoticeAlarm,
 }: MyComponentProps) => {
   const noticeRef = useRef<HTMLDivElement>(null);
   const settingRef = useRef<HTMLDivElement>(null);
   const [isClicked, setIsClicked] = useState(false);
 
   const openMessageNotice = () => {
+    handleHideNoticeAlarm();
     setIsClicked(false);
     const noticeComponent = noticeRef.current;
     const screenWidth = window.innerWidth;
@@ -83,38 +88,6 @@ const TopNavBar = ({
     color: isDarkMode ? '#EDECEB' : '#fff',
   };
 
-  /*
-  useEffect(() => {
-    const handleStorageChange = (event: any) => {
-      if (event.key === 'messageLog') {
-        // 이전에 저장된 배열
-        const data = localStorage.getItem('messageLog');
-        if (data) {
-          console.log('이게되냐?');
-          const previousData = JSON.parse(data) || [];
-          // 현재 저장된 배열
-          const currentData = JSON.parse(event.newValue || '') || [];
-
-          // 데이터 추가 여부 확인
-          if (currentData.length > previousData.length) {
-            console.log('messageLog 배열에 데이터가 추가되었습니다.');
-            setIsClicked(true);
-          } else {
-            console.log('엘시문');
-          }
-        }
-      }
-    };
-
-    // 이벤트 핸들러 등록
-    window.addEventListener('storage', handleStorageChange);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, [localStorage.getItem('messageLog')]);
-*/
-
   return (
     <AppBar position="static" style={appbarStyle}>
       <Toolbar style={toolbarStlye}>
@@ -130,14 +103,14 @@ const TopNavBar = ({
           }}
         >
           <NotificationsNoneOutlinedIcon fontSize="small" />
-          {isClicked ? (
+          {noticeAlarm ? (
             <CircleIcon
               style={{
                 position: 'absolute',
                 top: '60%',
                 left: '60%',
                 transform: 'translate(-40%, -40%)',
-                fontSize: '8px',
+                fontSize: '9px',
                 color: 'red',
               }}
             />
