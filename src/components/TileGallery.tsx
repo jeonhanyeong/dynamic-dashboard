@@ -87,6 +87,7 @@ const buttonStyle = {
 
 const TileGallery = ({ isDarkMode, handleGalleryVisible, tileTypes, handleAddComponentByClick }: MyComponentProps) => {
   const [selected, setSelected] = useState<number>(-1);
+  const [resultData, setResultData] = useState<TileInfo[]>(tileTypes);
 
   // 창 닫는 이벤트
   const handleGalleryClose = () => {
@@ -106,6 +107,16 @@ const TileGallery = ({ isDarkMode, handleGalleryVisible, tileTypes, handleAddCom
     }
   };
 
+  const handleDebouncingSearach = (textValue: string) => {
+    const copyData = [...tileTypes];
+    const filteredData = copyData.filter(
+      (item) =>
+        item.title.toLowerCase().includes(textValue.toLowerCase()) ||
+        item.description.toLowerCase().includes(textValue.toLowerCase()),
+    );
+    setResultData(filteredData);
+  };
+
   return (
     <TileGalleryContents>
       <TileGalleryHeader>
@@ -113,9 +124,9 @@ const TileGallery = ({ isDarkMode, handleGalleryVisible, tileTypes, handleAddCom
         <Close onClick={handleGalleryClose} />
       </TileGalleryHeader>
       <p style={{ fontSize: '12px', padding: '0 15px' }}>타일을 끌어서 놓거나 선택한 후 추가를 클릭하세요.</p>
-      <SearchBox isDarkMode={isDarkMode} />
+      <SearchBox isDarkMode={isDarkMode} handleDebouncingSearach={handleDebouncingSearach} />
       <TileGalleryBody>
-        {tileTypes.map((tileType, index) => (
+        {resultData.map((tileType, index) => (
           <Tile
             key={tileType.title}
             className={tileType.title}

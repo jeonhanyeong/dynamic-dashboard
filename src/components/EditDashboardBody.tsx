@@ -11,6 +11,8 @@ import MonthlyActiveUser from '../Cards/MonthlyActiveUser';
 import ActiveUsers from '../Cards/ActiveUsers';
 import UserList from '../Cards/UserList';
 import ServerTime from '../Cards/ServerTime';
+import darkBackgroundImage from '../assets/images/darkBackgroundImage.png';
+
 import { AutoMoving, ResizeAutoMoving } from '../functions/AutoMoving';
 
 interface ComponentPosition {
@@ -26,7 +28,10 @@ interface apiInfoInterface {
   username: string;
   password: string;
 }
-
+interface TimeZoneValueInfo {
+  cardName: string;
+  zone: string;
+}
 interface MyComponentProps extends HTMLAttributes<HTMLDivElement> {
   isDarkMode: boolean;
   apiInfo: apiInfoInterface;
@@ -43,8 +48,9 @@ interface MyComponentProps extends HTMLAttributes<HTMLDivElement> {
   handleEditSaveDashboard: (editTarget: string, title: string, components: ComponentPosition[]) => void;
   handleIsPreview: () => void;
   handleDragEnd: () => void;
-  handleTileSettingVisible: () => void;
+  handleTileSettingVisible: (cardName: string) => void;
   handleShowNoticeAlarm: () => void;
+  timeZoneValue: TimeZoneValueInfo;
 }
 
 interface TileGridProps {
@@ -115,8 +121,8 @@ const EditDashboard = styled.div`
 const TileGrid = styled.div<TileGridProps>`
   display: block;
   // background-image: url(https://portal.azure.com/Content/Static//MsPortalImpl/General/FlowLayout_gridShadow.png);
-  // background-image: ${(props) => (props.backgroundImage ? `url(${props.backgroundImage})` : 'none')};
-  background-image: ${(props) => props.theme.backImage};
+  background-image: ${(props) => (props.backgroundImage ? `url(${props.backgroundImage})` : 'none')};
+  // background-image: ${(props) => props.theme.backImage};
   background-attachment: scroll;
   width: 3865px;
   height: 2155px;
@@ -205,6 +211,7 @@ const EditDashboardBody = ({
   handleDragEnd,
   handleTileSettingVisible,
   handleShowNoticeAlarm,
+  timeZoneValue,
 }: MyComponentProps) => {
   let draggingTop = 0;
   let draggingLeft = 0;
@@ -679,6 +686,7 @@ const EditDashboardBody = ({
           handleContext={handleResizeContext}
           handleTileSettingVisible={handleTileSettingVisible}
           isDarkMode={isDarkMode}
+          timeZoneValue={timeZoneValue}
         />
       );
     }
@@ -867,12 +875,21 @@ const EditDashboardBody = ({
               갤러리 열기
             </Button>
           )}
-          <Switch onChange={handleShowResolutionGrid} />{' '}
-          <span
-            style={{ display: 'flex', alignItems: 'center', color: isDarkMode ? '#EDECEB' : '#000', fontSize: '14px' }}
-          >
-            해상도 그리드 표시
-          </span>
+          {clickPreview && (
+            <>
+              <Switch onChange={handleShowResolutionGrid} size="small" />
+              <span
+                style={{
+                  display: 'flex',
+                  paddingTop: '3px',
+                  color: isDarkMode ? '#EDECEB' : '#000',
+                  fontSize: '13px',
+                }}
+              >
+                해상도 그리드 표시
+              </span>
+            </>
+          )}
         </div>
       </ContentTop>
       <Explain>
@@ -908,7 +925,9 @@ const EditDashboardBody = ({
           onMouseDown={clickPreview ? handleMouseDown : undefined}
           backgroundImage={
             clickPreview
-              ? 'https://portal.azure.com/Content/Static//MsPortalImpl/General/FlowLayout_gridShadow.png'
+              ? isDarkMode
+                ? `${darkBackgroundImage}`
+                : 'https://portal.azure.com/Content/Static//MsPortalImpl/General/FlowLayout_gridShadow.png'
               : null
           }
         >

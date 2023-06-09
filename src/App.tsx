@@ -96,6 +96,11 @@ interface apiInfoInterface {
   username: string;
   password: string;
 }
+
+interface TimeZoneValueInfo {
+  cardName: string;
+  zone: string;
+}
 const App = () => {
   const apiInfo: apiInfoInterface = {
     gateway: 'https://gw.cloudmt.co.kr/',
@@ -146,6 +151,19 @@ const App = () => {
     clickedCount: 0,
   });
   const [menuRightPx, setMenuRightPx] = useState<number>(0);
+  const [timeZoneValue, setTimezoneValue] = useState<TimeZoneValueInfo>({
+    cardName: '',
+    zone: 'Asia/Seoul',
+  });
+  const [selectServerTimeCard, setSelectServerTimeCard] = useState('');
+
+  const handleTimeZone = (value: string) => {
+    setTimezoneValue((prev) => ({
+      ...prev,
+      cardName: selectServerTimeCard,
+      zone: value,
+    }));
+  };
 
   const handleHideNoticeAlarm = () => {
     setNoticeAlarm(false);
@@ -193,7 +211,8 @@ const App = () => {
     setSettingVisible(false);
   };
 
-  const handleTileSettingVisible = () => {
+  const handleTileSettingVisible = (cardName: string) => {
+    setSelectServerTimeCard(cardName);
     setGalleryVisible(false);
     setTileSettingVisible(!tileSettingVisible);
   };
@@ -231,12 +250,14 @@ const App = () => {
   const handleOpenDashboard = () => {
     setIsEditDashboard(!isEditDashboard);
     setGalleryVisible(false);
+    setTileSettingVisible(false);
   };
 
   const handleIsPreview = () => {
     if (galleryVisible) {
       setGalleryVisible(!galleryVisible);
     }
+    setTileSettingVisible(false);
   };
 
   // 저장 버튼을 눌렀을 때
@@ -257,6 +278,7 @@ const App = () => {
       setGalleryVisible(!galleryVisible);
     }
     setIsEditDashboard(!isEditDashboard);
+    setTileSettingVisible(false);
   };
 
   // 수정 완료 버튼을 눌렀을 때
@@ -287,6 +309,7 @@ const App = () => {
       setGalleryVisible(!galleryVisible);
     }
     setIsEditDashboard(!isEditDashboard);
+    setTileSettingVisible(false);
   };
 
   const settingClose = () => {
@@ -327,6 +350,7 @@ const App = () => {
                 handleTileSettingVisible={handleTileSettingVisible}
                 handleShowNoticeAlarm={handleShowNoticeAlarm}
                 isDarkMode={isDarkMode}
+                timeZoneValue={timeZoneValue}
               />
             </Dashboard>
           )}
@@ -348,6 +372,7 @@ const App = () => {
                 handleIsPreview={handleIsPreview}
                 handleTileSettingVisible={handleTileSettingVisible}
                 handleShowNoticeAlarm={handleShowNoticeAlarm}
+                timeZoneValue={timeZoneValue}
               />
             </Dashboard>
           )}
@@ -378,7 +403,12 @@ const App = () => {
           )}
 
           {tileSettingVisible && (
-            <TileSetting isDarkMode={isDarkMode} handleTileSettingVisible={handleTileSettingVisible} />
+            <TileSetting
+              isDarkMode={isDarkMode}
+              handleTimeZone={handleTimeZone}
+              handleTileSettingVisible={handleTileSettingVisible}
+              selectServerTimeCard={selectServerTimeCard}
+            />
           )}
         </Contents>
       </WebContainer>

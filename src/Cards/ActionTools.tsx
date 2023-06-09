@@ -69,7 +69,7 @@ interface MyComponentProps {
   handleDelete: ((event: React.MouseEvent) => void) | null;
   handleSelectCard: (dep: number) => void;
   handleContext: ((name: string, ratioWidth: number, ratioHeight: number) => void) | null;
-  handleTileSettingVisible: () => void;
+  handleTileSettingVisible: (cardName: string) => void;
 }
 interface ContextMenuPosition {
   state: boolean;
@@ -104,8 +104,8 @@ const ActionTools = ({
     opacity: 0.5,
   });
 
-  const handleSettingOpen = () => {
-    handleTileSettingVisible();
+  const handleSettingOpen = (cardName: string) => {
+    handleTileSettingVisible(cardName);
   };
 
   const handleMouseEnter = (event: MouseEvent) => {

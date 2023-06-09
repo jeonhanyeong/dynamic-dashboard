@@ -40,7 +40,7 @@ interface CardPosition {
   handleDelete: ((event: React.MouseEvent) => void) | null;
   handleContext: ((name: string, ratioWidth: number, ratioHeight: number) => void) | null;
   apiInfo: apiInfoInterface;
-  handleTileSettingVisible: () => void;
+  handleTileSettingVisible: (cardName: string) => void;
   isDarkMode: boolean;
 }
 

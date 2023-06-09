@@ -28,12 +28,17 @@ interface apiInfoInterface {
   password: string;
 }
 
+interface TimeZoneValueInfo {
+  cardName: string;
+  zone: string;
+}
 interface MyComponentProps {
   apiInfo: apiInfoInterface;
   handleOpenEditDashboard: (editTarget: string | null) => void;
   isDarkMode: boolean;
-  handleTileSettingVisible: () => void;
+  handleTileSettingVisible: (cardName: string) => void;
   handleShowNoticeAlarm: () => void;
+  timeZoneValue: TimeZoneValueInfo;
 }
 
 interface LocalStorageType {
@@ -181,6 +186,7 @@ const DashboardBody = ({
   isDarkMode,
   handleTileSettingVisible,
   handleShowNoticeAlarm,
+  timeZoneValue,
 }: MyComponentProps) => {
   const [isSaving, setIsSaving] = useState(true);
   const [clickedDashboardList, setClickedDashboardList] = useState(false);
@@ -376,6 +382,7 @@ const DashboardBody = ({
                       handleContext={null}
                       isDarkMode={isDarkMode}
                       handleTileSettingVisible={handleTileSettingVisible}
+                      timeZoneValue={timeZoneValue}
                     />
                   );
                 }

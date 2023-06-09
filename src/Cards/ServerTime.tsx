@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import styled from 'styled-components';
+import moment from 'moment-timezone';
 import ActionTools from './ActionTools';
 
 const CardBoard = styled.div`
@@ -19,6 +20,10 @@ const CardBoard = styled.div`
   min-width: 84px;
 `;
 
+interface TimeZoneValueInfo {
+  cardName: string;
+  zone: string;
+}
 interface CardPosition {
   topPx: number;
   leftPx: number;
@@ -30,16 +35,18 @@ interface CardPosition {
   handleDelete: ((event: React.MouseEvent) => void) | null;
   handleContext: ((name: string, ratioWidth: number, ratioHeight: number) => void) | null;
   isDarkMode: boolean;
-  handleTileSettingVisible: () => void;
+  handleTileSettingVisible: (cardName: string) => void;
+  timeZoneValue: TimeZoneValueInfo;
 }
 
 interface TimeInfo {
-  year: number;
-  month: string;
-  day: string;
-  hours: string;
-  minutes: string;
-  seconds: string;
+  date: string;
+  time: string;
+}
+
+interface TimeZoneInfo {
+  continent: string;
+  city: string;
 }
 
 const ServerTime = ({
@@ -54,17 +61,16 @@ const ServerTime = ({
   handleDelete,
   handleContext,
   handleTileSettingVisible,
+  timeZoneValue,
 }: CardPosition) => {
   const cardBoardRef = useRef<HTMLDivElement>(null);
   const [depth, setDepth] = useState(991);
+  const [timeZoneName, setTimeZoneName] = useState<TimeZoneInfo>();
+  const [prevTimeZone, setPrevTimeZone] = useState('');
 
   const [timer, setTimer] = useState<TimeInfo>({
-    year: 0,
-    month: '0',
-    day: '0',
-    hours: '0',
-    minutes: '0',
-    seconds: '0',
+    date: '',
+    time: '',
   });
   const [fontRatio, setFontRatio] = useState(0);
 
@@ -73,33 +79,42 @@ const ServerTime = ({
   };
 
   const currentTimer = () => {
-    const date = new Date();
-    let hours = date.getHours();
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-
-    // 12시간 형식으로 변경
-    hours = hours % 12 || 12;
-
-    const updateCurrentTime = { ...timer };
-    updateCurrentTime.year = date.getFullYear();
-    updateCurrentTime.month = String(date.getMonth() + 1).padStart(2, '0');
-    updateCurrentTime.day = String(date.getDate()).padStart(2, '0');
-    updateCurrentTime.hours = String(date.getHours()).padStart(2, '0');
-    updateCurrentTime.minutes = String(date.getMinutes()).padStart(2, '0');
-    updateCurrentTime.seconds = String(date.getSeconds()).padStart(2, '0');
-    setTimer(updateCurrentTime);
+    const selectTimeZone = (timeZoneValue.zone as string)
+      ? moment()
+          .tz(timeZoneValue.zone as string)
+          .format('YYYY-MM-DD HH:mm:ss')
+      : '';
+    const dateTime = moment(selectTimeZone);
+    const selDate = dateTime.format('YYYY년 MM월 DD일');
+    const selTime = dateTime.format('HH:mm:ss');
+    setTimer((prev) => ({
+      ...prev,
+      date: selDate,
+      time: selTime,
+    }));
   };
 
   useEffect(() => {
     setFontRatio(Math.floor(widthPx / 6));
   }, [widthPx]);
 
+  // timeZoneValue.cardName 이랑 현재 카드랑 비교해서 맞는지 검사 후에 ....이거 해결해야 카드 전체가 안바뀜
   useEffect(() => {
+    const timeZone = timeZoneValue.zone as string;
+    const parts = timeZone.split('/'); // '/'를 기준으로 문자열을 나눔
+    const formattedTimeZone = parts.map((part) => part.replace('_', ' ')); // '_'를 공백으로 대체
+    setTimeZoneName((prev) => ({
+      ...prev,
+      continent: formattedTimeZone[0],
+      city: formattedTimeZone[1],
+    }));
     const serverTime = setInterval(currentTimer, 1000);
+
     return () => {
       clearInterval(serverTime);
     };
-  }, []);
+  }, [timeZoneValue]);
+
   return (
     <CardBoard
       ref={cardBoardRef}
@@ -136,13 +151,18 @@ const ServerTime = ({
           flexDirection: 'column',
         }}
       >
-        <span style={{ color: isDarkMode ? '#EDECEB' : '#000', fontSize: fontRatio / 3.5 }}> 대한민국 표준시 </span>
-        <span style={{ color: isDarkMode ? '#EDECEB' : '#000', fontSize: fontRatio, marginBottom: '10px' }}>
-          <strong>{`${timer.hours}:${timer.minutes}:${timer.seconds}`}</strong>
+        <span style={{ color: isDarkMode ? '#EDECEB' : '#000', fontSize: fontRatio / 3.5 }}>
+          {' '}
+          {timeZoneName?.continent}{' '}
         </span>
-        <span
-          style={{ color: isDarkMode ? 'lightgray' : 'gray', fontSize: fontRatio / 3.5 }}
-        >{`${timer.year}년 ${timer.month}월 ${timer.day}일`}</span>
+        <span style={{ color: isDarkMode ? '#EDECEB' : '#000', fontSize: fontRatio / 3 }}>
+          {' '}
+          <strong>{timeZoneName?.city} </strong>
+        </span>
+        <span style={{ color: isDarkMode ? '#EDECEB' : '#000', fontSize: fontRatio, marginBottom: '10px' }}>
+          <strong>{`${timer.time}`}</strong>
+        </span>
+        <span style={{ color: isDarkMode ? 'lightgray' : 'gray', fontSize: fontRatio / 3.5 }}>{`${timer.date}`}</span>
       </div>
     </CardBoard>
   );

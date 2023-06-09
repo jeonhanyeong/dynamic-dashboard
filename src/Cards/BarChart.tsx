@@ -49,7 +49,7 @@ interface CardPosition {
   handleContext: ((name: string, ratioWidth: number, ratioHeight: number) => void) | null;
   apiInfo: apiInfoInterface;
   isDarkMode: boolean;
-  handleTileSettingVisible: () => void;
+  handleTileSettingVisible: (cardName: string) => void;
 }
 
 interface dataInterface {

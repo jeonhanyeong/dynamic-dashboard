@@ -49,7 +49,7 @@ interface ContextMenuProps {
   handleContext: ((name: string, ratioWidth: number, ratioHeight: number) => void) | null;
   handleResizeRatioClick: (id: string) => void;
   currentRatio: string;
-  handleSettingOpen: () => void;
+  handleSettingOpen: (cardName: string) => void;
 }
 
 interface resizeOption {
@@ -96,7 +96,7 @@ const ContextMenu = ({
   };
 
   const settingOpen = () => {
-    handleSettingOpen();
+    handleSettingOpen(name);
   };
   useEffect(() => {
     const updatedResizeClick = resizeClick.map((rc) => ({
