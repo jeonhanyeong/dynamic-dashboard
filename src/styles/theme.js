@@ -10,6 +10,7 @@ export const lightTheme = {
   navHoverColor: '#3aa0f3',
   scrollColor: '#1976d2',
   backImage: 'url(https://portal.azure.com/Content/Static//MsPortalImpl/General/FlowLayout_gridShadow.png)',
+  cardBackColor: '#fff',
 };
 
 export const darkTheme = {
@@ -22,6 +23,7 @@ export const darkTheme = {
   navHoverColor: '#3e3d3c',
   scrollColor: 'rgba(0, 0, 0, 0.3)',
   backImage: `url(${test})`,
+  cardBackColor: '#252423',
 };
 
 export const theme = {

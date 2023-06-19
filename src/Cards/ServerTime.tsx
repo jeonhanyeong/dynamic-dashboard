@@ -9,7 +9,7 @@ const CardBoard = styled.div`
   box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.132), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.108);
   box-sizing: border-box;
   padding: 10px;
-  background-color: ${(props) => props.theme.bgColor};
+  background-color: ${(props) => props.theme.cardBackColor};
   position: absolute;
   border-radius: 2px;
 
@@ -94,11 +94,13 @@ const ServerTime = ({
     }));
   };
 
+  console.log('커렌트타이머')
   useEffect(() => {
     setFontRatio(Math.floor(widthPx / 6));
   }, [widthPx]);
 
   // timeZoneValue.cardName 이랑 현재 카드랑 비교해서 맞는지 검사 후에 ....이거 해결해야 카드 전체가 안바뀜
+  
   useEffect(() => {
     const timeZone = timeZoneValue.zone as string;
     const parts = timeZone.split('/'); // '/'를 기준으로 문자열을 나눔
@@ -109,11 +111,31 @@ const ServerTime = ({
       city: formattedTimeZone[1],
     }));
     const serverTime = setInterval(currentTimer, 1000);
+   return () => {
 
-    return () => {
-      clearInterval(serverTime);
-    };
+     clearInterval(serverTime);
+   };
   }, [timeZoneValue]);
+
+  // console.log('리렌더링')
+
+// useEffect(()=>{
+//  setInterval(currentTimer, 1000);
+// },[])
+
+// useEffect(()=>{
+//   const serverTime = setInterval(currentTimer, 1000);
+//   console.log('실행')
+//   return () => {
+//     console.log('지움')
+//     clearInterval(serverTime);
+//   };
+// },[])
+
+
+
+//   const ttt = setInterval(currentTimer, 1000);
+// clearInterval(ttt)
 
   return (
     <CardBoard

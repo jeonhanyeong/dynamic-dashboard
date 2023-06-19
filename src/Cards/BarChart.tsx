@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { Chart, Series, Export, Legend, Tooltip } from 'devextreme-react/chart';
+import { Chart, Series, Export, Legend, Tooltip, ValueAxis, Grid } from 'devextreme-react/chart';
 import axios from 'axios';
 import { encode } from 'base-64';
 import styled from 'styled-components';
@@ -11,7 +11,7 @@ const CardBoard = styled.div`
   box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.132), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.108);
   box-sizing: border-box;
   padding: 10px;
-  background-color: ${(props) => props.theme.bgColor};
+  background-color: ${(props) => props.theme.cardBackColor};
   position: absolute;
   border-radius: 2px;
 
@@ -201,7 +201,9 @@ const BarChart = ({
       <Chart height="92%" width="100%" id="chart" dataSource={chartDataSource}>
         <Series valueField="count" argumentField="month" name="MAU" type="bar" color="#4EBEF0" />
         <Tooltip enabled />
-
+        <ValueAxis>
+            <Grid visible color={isDarkMode ? '#6F6E6D' : '#e2e2e2'}/>
+          </ValueAxis>
         <Legend verticalAlignment="bottom" horizontalAlignment="center" />
       </Chart>
     </CardBoard>

@@ -1,26 +1,26 @@
 /* 다크 모드 */
 .dx-theme-dark .dx-datagrid{
-  background-color: #1B1A19;
+  background-color: #252423;
   color: #EDECEB;
 }
 .dx-theme-dark .dx-datagrid .dx-datagrid-summary-item{
-  background-color: #1B1A19;
+  background-color: #252423;
   color: #EDECEB;
 }
 .dx-theme-dark .dx-datagrid .dx-toolbar{
-  background-color: #1B1A19;
+  background-color: #252423;
   color: #EDECEB;
 }
 .dx-theme-dark .dx-datagrid .dx-button{
-  background-color: #1B1A19;
+  background-color: #252423;
   color: #EDECEB;
 }
 .dx-theme-dark .dx-datagrid .dx-textbox{
-  background-color: #1B1A19;
+  background-color: #252423;
   color: #EDECEB;
 }
 .dx-theme-dark .dx-datagrid i{
-  background-color: #1B1A19;
+  background-color: #252423;
   color: #EDECEB;
 }
 .dx-theme-dark .dx-datagrid .dx-data-row:hover{
@@ -31,7 +31,7 @@
   color: #EDECEB;
 }
 .dx-theme-dark .dx-datagrid .dx-loadpanel-content{
-  background-color: #1B1A19;
+  background-color: #252423;
   color: #EDECEB;
 }
 
@@ -42,13 +42,11 @@
 }
 
 .dx-theme-dark .dx-popup-wrapper .dx-popup-normal{
-  background-color: #1B1A19;
+  background-color: #252423;
   color: #EDECEB;
 }
 .dx-theme-dark .dx-popup-wrapper .dx-popup-normal .dx-toolbar-item-content{
-  background-color: #1B1A19;
+  background-color: #252423;
   color: #EDECEB;
 }
-
-
 

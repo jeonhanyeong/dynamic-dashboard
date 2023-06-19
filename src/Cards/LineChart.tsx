@@ -3,15 +3,12 @@ import {
   Series,
   ArgumentAxis,
   CommonSeriesSettings,
-  Export,
   Legend,
   Margin,
-  Title,
-  Subtitle,
   Tooltip,
   Grid,
+  ValueAxis,
 } from 'devextreme-react/chart';
-
 import { useRef, useState, useEffect } from 'react';
 import axios from 'axios';
 import { encode } from 'base-64';
@@ -24,7 +21,7 @@ const CardBoard = styled.div`
   box-shadow: 0 1.6px 3.6px 0 rgba(0, 0, 0, 0.132), 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.108);
   box-sizing: border-box;
   padding: 10px;
-  background-color: ${(props) => props.theme.bgColor};
+  background-color: ${(props) => props.theme.cardBackColor};
   position: absolute;
   border-radius: 2px;
 
@@ -84,7 +81,7 @@ const LineChart = ({
   const cardBoardRef = useRef<HTMLDivElement>(null);
   const [depth, setDepth] = useState(991);
   const [applicationData, setApplicationData] = useState({});
-  const paletteaa = ['#1976D2', '#10DED8', '#10B5E8', '#464EB8', '#D1382E', '#DB9827'];
+  const paletteaa = ['#1976D2',  '#10B5E8', '#464EB8', '#10DED8','#D1382E', '#DB9827'];
 
   const applicationSources = [
     { value: 'Billing', name: 'Billing' },
@@ -119,6 +116,7 @@ const LineChart = ({
 
   useEffect(() => {
     getData();
+  
   }, []);
 
   return (
@@ -163,10 +161,12 @@ const LineChart = ({
           ))}
           <Margin bottom={20} />
           <ArgumentAxis valueMarginsEnabled discreteAxisDivisionMode="crossLabels">
-            <Grid visible />
+            <Grid visible color={isDarkMode ? '#6F6E6D' : '#e2e2e2'} />
           </ArgumentAxis>
+          <ValueAxis>
+            <Grid visible color={isDarkMode ? '#6F6E6D' : '#e2e2e2'}/>
+          </ValueAxis>
           <Legend verticalAlignment="bottom" horizontalAlignment="center" itemTextPosition="bottom" />
-
           <Tooltip enabled />
         </Chart>
       </div>
@@ -174,5 +174,4 @@ const LineChart = ({
   );
 };
 
-// <Export enabled />
 export default LineChart;

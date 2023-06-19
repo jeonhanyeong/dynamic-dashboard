@@ -314,9 +314,7 @@ const DashboardBody = ({
             <FullscreenIcon color="primary" />
             <span style={{ marginLeft: '5px' }}>전체 화면</span>
           </Tool>
-          <Tool onClick={testDelete}>
-            <span style={{ marginLeft: '5px' }}>로컬 스토리지삭제(테스트용)</span>
-          </Tool>
+
           {parsedData && parsedData.length > 0 ? (
             <LastUpdate>
               <span>마지막으로 업데이트한 날짜: {parsedData[0].saveDate}</span>

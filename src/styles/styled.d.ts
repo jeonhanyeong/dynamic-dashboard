@@ -11,5 +11,6 @@ declare module 'styled-components' {
     navHoverColor: string;
     scrollColor: string;
     backImage: string;
+    cardBackColor: string;
   }
 }
