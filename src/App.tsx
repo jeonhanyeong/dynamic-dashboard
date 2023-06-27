@@ -103,9 +103,9 @@ interface TimeZoneValueInfo {
 }
 const App = () => {
   const apiInfo: apiInfoInterface = {
-    gateway: 'https://gw.cloudmt.co.kr/',
-    username: 'dashboard_api',
-    password: 'zmffkdnemapdlxm1Emd!',
+    gateway: '', // 레포 올리려고 지움 username
+    username: '', // 레포 올리려고 지움 username
+    password: '', // 레포 올리려고 지움 username
   };
   const parent = useRef<HTMLDivElement>(null);
   // const setting = useRef<HTMLDivElement>(null);

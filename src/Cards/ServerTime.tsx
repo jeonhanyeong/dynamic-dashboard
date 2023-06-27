@@ -94,13 +94,13 @@ const ServerTime = ({
     }));
   };
 
-  console.log('커렌트타이머')
+  console.log('커렌트타이머');
   useEffect(() => {
     setFontRatio(Math.floor(widthPx / 6));
   }, [widthPx]);
 
   // timeZoneValue.cardName 이랑 현재 카드랑 비교해서 맞는지 검사 후에 ....이거 해결해야 카드 전체가 안바뀜
-  
+
   useEffect(() => {
     const timeZone = timeZoneValue.zone as string;
     const parts = timeZone.split('/'); // '/'를 기준으로 문자열을 나눔
@@ -111,31 +111,28 @@ const ServerTime = ({
       city: formattedTimeZone[1],
     }));
     const serverTime = setInterval(currentTimer, 1000);
-   return () => {
-
-     clearInterval(serverTime);
-   };
+    return () => {
+      clearInterval(serverTime);
+    };
   }, [timeZoneValue]);
 
   // console.log('리렌더링')
 
-// useEffect(()=>{
-//  setInterval(currentTimer, 1000);
-// },[])
+  // useEffect(()=>{
+  //  setInterval(currentTimer, 1000);
+  // },[])
 
-// useEffect(()=>{
-//   const serverTime = setInterval(currentTimer, 1000);
-//   console.log('실행')
-//   return () => {
-//     console.log('지움')
-//     clearInterval(serverTime);
-//   };
-// },[])
+  // useEffect(()=>{
+  //   const serverTime = setInterval(currentTimer, 1000);
+  //   console.log('실행')
+  //   return () => {
+  //     console.log('지움')
+  //     clearInterval(serverTime);
+  //   };
+  // },[])
 
-
-
-//   const ttt = setInterval(currentTimer, 1000);
-// clearInterval(ttt)
+  //   const ttt = setInterval(currentTimer, 1000);
+  // clearInterval(ttt)
 
   return (
     <CardBoard
